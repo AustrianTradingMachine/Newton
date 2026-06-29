@@ -87,7 +87,6 @@ def solve_hanging(msh, comm, n_steps=5):
     from mpi4py import MPI
     from dolfinx import fem, default_scalar_type
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.nls.petsc import NewtonSolver
 
     V = fem.functionspace(msh, ("Lagrange", 1, (msh.geometry.dim,)))
     u = fem.Function(V, name="displacement")
@@ -106,22 +105,29 @@ def solve_hanging(msh, comm, n_steps=5):
     body_force = load_scale * g_vec
 
     residual = neo_hookean_residual(u, v, msh, mu, lmbda, body_force)
-    problem = NonlinearProblem(residual, u, bcs=[bc])
-    solver = NewtonSolver(comm, problem)
-    solver.rtol = 1.0e-8
-    solver.atol = 1.0e-10
-    solver.max_it = 50
-    solver.convergence_criterion = "incremental"
+    # dolfinx 0.11: SNES-based NonlinearProblem (NewtonSolver is gone). solve()
+    # updates u in place; a direct LU is plenty for these small meshes.
+    problem = NonlinearProblem(
+        residual, u, bcs=[bc], petsc_options_prefix="hang_",
+        petsc_options={
+            "snes_type": "newtonls",
+            "snes_rtol": 1.0e-8, "snes_atol": 1.0e-10, "snes_max_it": 50,
+            "ksp_type": "preonly", "pc_type": "lu",
+        },
+    )
 
     total_its = 0
     for k in range(1, n_steps + 1):
         load_scale.value = k / n_steps
-        n_it, converged = solver.solve(u)
+        problem.solve()
         u.x.scatter_forward()
-        total_its += int(n_it)
-        print(f"[fem] load step {k}/{n_steps}: newton_its={n_it} converged={bool(converged)}")
-        if not converged:
-            raise RuntimeError(f"FEM Newton solver failed at load step {k}")
+        snes = getattr(problem, "solver", None)
+        n_it = int(snes.getIterationNumber()) if snes is not None else -1
+        reason = int(snes.getConvergedReason()) if snes is not None else 1
+        total_its += max(n_it, 0)
+        print(f"[fem] load step {k}/{n_steps}: snes_its={n_it} reason={reason}")
+        if reason < 0:
+            raise RuntimeError(f"FEM SNES diverged at load step {k} (reason={reason})")
 
     return u, len(top_dofs), total_its
 
@@ -135,12 +141,12 @@ def _build_tet_mesh(comm):
     rest_q, tets, fixed = mesh_io.load_mesh(params.MESH_NPZ)
     tets = mesh_io.orient_tets_positive(rest_q, tets)
     coord_el = basix.ufl.element("Lagrange", "tetrahedron", 1, shape=(3,))
-    # TODO[verify-on-colab]: create_mesh(comm, cells, x, domain) arg form.
+    # dolfinx 0.11 order: create_mesh(comm, cells, e, x) -- element BEFORE coords.
     msh = dmesh.create_mesh(
         comm,
         np.ascontiguousarray(tets, dtype=np.int64),
-        np.ascontiguousarray(rest_q, dtype=np.float64),
         ufl.Mesh(coord_el),
+        np.ascontiguousarray(rest_q, dtype=np.float64),
     )
     return msh, rest_q, tets, fixed
 
