@@ -31,7 +31,8 @@ import time
 import numpy as np
 
 from common import params
-from fenics_run.run_stage_a import neo_hookean_residual, evaluate_at_nodes
+from fenics_run.run_stage_a import (neo_hookean_residual, evaluate_at_nodes,
+                                    fem_snes_options, solve_status)
 
 
 def _slug(cell_name, factor, method):
@@ -51,7 +52,6 @@ def _run(cell_name, penalty_factor, method, comm):
     from dolfinx import fem, default_scalar_type
     from dolfinx.mesh import create_box, CellType, locate_entities_boundary, meshtags
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.nls.petsc import NewtonSolver
 
     cell_type = CellType.tetrahedron if cell_name == "tet" else CellType.hexahedron
     is_aug = method == "aug_lagrangian"
@@ -101,12 +101,11 @@ def _run(cell_name, penalty_factor, method, comm):
     bulk = neo_hookean_residual(u, v, msh, mu, lmbda, body_force)
     residual = bulk - pressure * ufl.dot(n_obs, v) * ds(TOP)
 
-    problem = NonlinearProblem(residual, u, bcs=[bc])
-    solver = NewtonSolver(comm, problem)
-    solver.rtol = 1.0e-7
-    solver.atol = 1.0e-10
-    solver.max_it = 60
-    solver.convergence_criterion = "incremental"
+    problem = NonlinearProblem(
+        residual, u, bcs=[bc],
+        petsc_options_prefix=f"sb_{_slug(cell_name, penalty_factor, method)}_",
+        petsc_options=fem_snes_options(rtol=1.0e-7, atol=1.0e-10, max_it=60),
+    )
 
     force_form = fem.form(pressure * n_obs[2] * ds(TOP))
     dim = msh.geometry.dim
@@ -140,8 +139,7 @@ def _run(cell_name, penalty_factor, method, comm):
         delta = params.STAGEB_INDENT_MAX * k / n_steps
         centre.value = np.array([cx, cy, Lz + R - delta], dtype=default_scalar_type)
         for a in range(n_aug):
-            n_it, converged = solver.solve(u)
-            u.x.scatter_forward()
+            n_it, converged = solve_status(problem, u)
             if is_aug:
                 lam_tmp.interpolate(lam_update)         # p = <lam - kn*g>+
                 lam.x.array[:] = lam_tmp.x.array         # lambda <- p  (Uzawa update)

@@ -32,6 +32,7 @@ import os
 import numpy as np
 
 from common import params
+from fenics_run.run_stage_a import fem_snes_options, solve_status
 
 
 def main():
@@ -41,7 +42,6 @@ def main():
     from dolfinx import fem, default_scalar_type
     from dolfinx.mesh import create_box, CellType, locate_entities_boundary, meshtags
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.nls.petsc import NewtonSolver
 
     comm = MPI.COMM_WORLD
     print(f"[drop-fem] dolfinx {dolfinx.__version__}")
@@ -120,12 +120,9 @@ def main():
                 - p_ground * w[2] * ds(BOTTOM)
                 - p_sphere * ufl.dot(n_s, w) * ds(TOP))
 
-    problem = NonlinearProblem(residual, u, bcs=[])        # dynamics: mass term regularises (no Dirichlet)
-    solver = NewtonSolver(comm, problem)
-    solver.rtol = 1.0e-7
-    solver.atol = 1.0e-9
-    solver.max_it = 50
-    solver.convergence_criterion = "incremental"
+    # dynamics: the mass term regularises the tangent (no Dirichlet). dolfinx 0.11 SNES.
+    problem = NonlinearProblem(residual, u, bcs=[], petsc_options_prefix="drop_",
+                               petsc_options=fem_snes_options(rtol=1.0e-7, atol=1.0e-9, max_it=50))
 
     # update expressions (Newmark) and diagnostics
     ip = V.element.interpolation_points()
@@ -157,8 +154,7 @@ def main():
     for k in range(params.DROP_STEPS):
         centre.value = np.array([cx, cy, c_z], dtype=default_scalar_type)
         v_sphere.value = np.array([0.0, 0.0, v_s], dtype=default_scalar_type)
-        n_it, converged = solver.solve(u)
-        u.x.scatter_forward()
+        n_it, converged = solve_status(problem, u)
 
         # contact force and sphere update (staggered ODE)
         fz_on_block = comm.allreduce(fem.assemble_scalar(fz_on_block_form), op=MPI.SUM)

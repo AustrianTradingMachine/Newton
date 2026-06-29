@@ -77,6 +77,29 @@ def evaluate_at_nodes(u, msh, points):
     return u.eval(points, cells)
 
 
+def fem_snes_options(rtol=1.0e-7, atol=1.0e-9, max_it=60):
+    """PETSc options for a direct-LU Newton (SNES) solve -- dolfinx 0.11 style."""
+    return {
+        "snes_type": "newtonls",
+        "snes_rtol": rtol, "snes_atol": atol, "snes_max_it": max_it,
+        "ksp_type": "preonly", "pc_type": "lu",
+    }
+
+
+def solve_status(problem, u):
+    """Solve a dolfinx 0.11 NonlinearProblem, scatter, return (n_iterations, converged).
+
+    The SNES is read defensively (attribute name guarded) so the solve still works
+    even if convergence introspection is unavailable.
+    """
+    problem.solve()
+    u.x.scatter_forward()
+    snes = getattr(problem, "solver", None)
+    if snes is None:
+        return -1, True
+    return int(snes.getIterationNumber()), bool(snes.getConvergedReason() > 0)
+
+
 def solve_hanging(msh, comm, n_steps=5):
     """Solve the clamped-top hanging block under gravity.
 

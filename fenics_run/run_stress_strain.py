@@ -20,6 +20,7 @@ import numpy as np
 
 from common import params
 from compare import energies as en
+from fenics_run.run_stage_a import fem_snes_options, solve_status
 
 
 def main():
@@ -29,7 +30,6 @@ def main():
     from dolfinx import fem, default_scalar_type
     from dolfinx.mesh import create_box, CellType, exterior_facet_indices, locate_dofs_topological
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.nls.petsc import NewtonSolver
 
     comm = MPI.COMM_WORLD
     print(f"[stress-fem] dolfinx {dolfinx.__version__}")
@@ -65,11 +65,8 @@ def main():
     P = mu * (F - Finv_T) + lam * ufl.ln(J) * Finv_T
     residual = ufl.inner(ufl.grad(w), P) * ufl.dx
 
-    problem = NonlinearProblem(residual, u, bcs=[bc])
-    solver = NewtonSolver(comm, problem)
-    solver.rtol = 1.0e-8
-    solver.max_it = 50
-    solver.convergence_criterion = "incremental"
+    problem = NonlinearProblem(residual, u, bcs=[bc], petsc_options_prefix="stress_",
+                               petsc_options=fem_snes_options(rtol=1.0e-8, max_it=50))
 
     vol = Lx * Ly * Lz
     stress_form = fem.form(P[2, 2] * ufl.dx)
@@ -79,8 +76,7 @@ def main():
     for L in lambdas:
         lam_c.value = float(L)
         u_bc.interpolate(bc_expr)
-        solver.solve(u)
-        u.x.scatter_forward()
+        solve_status(problem, u)
         sig = comm.allreduce(fem.assemble_scalar(stress_form), op=MPI.SUM) / vol
         sigma_fem.append(sig)
         print(f"[stress-fem] lambda={L:.3f}  sigma={sig:.4g} Pa")

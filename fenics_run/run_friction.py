@@ -39,7 +39,8 @@ import time
 import numpy as np
 
 from common import params
-from fenics_run.run_stage_a import neo_hookean_residual, evaluate_at_nodes
+from fenics_run.run_stage_a import (neo_hookean_residual, evaluate_at_nodes,
+                                    fem_snes_options, solve_status)
 
 
 def main():
@@ -48,7 +49,6 @@ def main():
     from dolfinx import fem, default_scalar_type
     from dolfinx.mesh import create_box, CellType, locate_entities_boundary, meshtags
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.nls.petsc import NewtonSolver
 
     comm = MPI.COMM_WORLD
     nx, ny, nz = params.FRICTION_DIM
@@ -106,12 +106,8 @@ def main():
     bulk = neo_hookean_residual(u, v, msh, mu_c, lmbda, body_force)
     residual = bulk - ufl.inner(traction, v) * ds(BOT)
 
-    problem = NonlinearProblem(residual, u, bcs=bcs)
-    solver = NewtonSolver(comm, problem)
-    solver.rtol = 1.0e-7
-    solver.atol = 1.0e-9
-    solver.max_it = 80
-    solver.convergence_criterion = "incremental"
+    problem = NonlinearProblem(residual, u, bcs=bcs, petsc_options_prefix="fric_",
+                               petsc_options=fem_snes_options(max_it=80))
 
     # --- measurement forms ---------------------------------------------------
     area = comm.allreduce(fem.assemble_scalar(fem.form(fem.Constant(msh, 1.0) * ds(BOT))), op=MPI.SUM)
@@ -124,7 +120,7 @@ def main():
     def settle_gravity():
         for s in (0.25, 0.5, 0.75, 1.0):
             load_scale.value = s
-            solver.solve(u); u.x.scatter_forward()
+            solve_status(problem, u)
 
     drags = np.linspace(0.0, params.FRICTION_DRAG_MAX, params.FRICTION_STEPS + 1)
     weight = params.friction_block_weight()
@@ -142,7 +138,7 @@ def main():
             settle_gravity()
         else:
             load_scale.value = 1.0
-            n_it, converged = solver.solve(u); u.x.scatter_forward()
+            n_it, converged = solve_status(problem, u)
         F = comm.allreduce(fem.assemble_scalar(Ffric_form), op=MPI.SUM)
         N = comm.allreduce(fem.assemble_scalar(Nform), op=MPI.SUM)
         mean_slip = comm.allreduce(fem.assemble_scalar(slip_form), op=MPI.SUM) / area
