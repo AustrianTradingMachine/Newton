@@ -115,9 +115,9 @@ def _run(cell_name, penalty_factor, method, comm):
     strain_form = fem.form(psi * ufl.dx)
     contact_energy_form = fem.form(0.5 * kn * penetration_ufl ** 2 * ds(TOP))
 
-    # interpolation expressions: max penetration tracker and the Uzawa update
-    # TODO[verify-on-colab]: Vs.element.interpolation_points() API form
-    ip = Vs.element.interpolation_points()
+    # interpolation expressions: max penetration tracker and the Uzawa update.
+    # dolfinx 0.11: element.interpolation_points is an attribute (array), not a call.
+    ip = Vs.element.interpolation_points
     pen_expr = fem.Expression(penetration_ufl, ip)
     lam_update = fem.Expression(pressure, ip)
     pen_func = fem.Function(Vs)

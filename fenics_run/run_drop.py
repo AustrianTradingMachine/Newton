@@ -125,7 +125,7 @@ def main():
                                petsc_options=fem_snes_options(rtol=1.0e-7, atol=1.0e-9, max_it=50))
 
     # update expressions (Newmark) and diagnostics
-    ip = V.element.interpolation_points()
+    ip = V.element.interpolation_points
     a_expr = fem.Expression(a_new, ip)
     v_expr = fem.Expression(v_new, ip)
     a_tmp, v_tmp = fem.Function(V), fem.Function(V)
@@ -134,7 +134,7 @@ def main():
                             + 0.5 * lam * ufl.ln(J) ** 2) * ufl.dx)
     ke_form = fem.form(0.5 * rho * ufl.dot(v_new, v_new) * ufl.dx)
     fz_on_block_form = fem.form(p_sphere * n_s[2] * ds(TOP))   # z-force sphere exerts on block (<=0)
-    ips = Vs.element.interpolation_points()
+    ips = Vs.element.interpolation_points
     pen_expr = fem.Expression(pen_s, ips)
     pen_fn = fem.Function(Vs)
 

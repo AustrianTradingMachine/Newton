@@ -54,7 +54,7 @@ def main():
     lam_c = fem.Constant(msh, default_scalar_type(1.0))
     X = ufl.SpatialCoordinate(msh)
     bc_expr = fem.Expression(ufl.as_vector((0.0 * X[0], 0.0 * X[1], (lam_c - 1.0) * X[2])),
-                             V.element.interpolation_points())
+                             V.element.interpolation_points)
 
     mu = default_scalar_type(params.K_MU)
     lam = default_scalar_type(params.K_LAMBDA)
