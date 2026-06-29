@@ -23,7 +23,7 @@ solver-error picture; the FEM half is fenics_run/convergence_stage_a.py.
 
 -> data/newton_convergence.npz
 
-Run on Colab/Kaggle (CUDA):  python -m newton_run.convergence_stage_a
+Run on Colab (CUDA):  python -m newton_run.convergence_stage_a
 """
 
 from __future__ import annotations

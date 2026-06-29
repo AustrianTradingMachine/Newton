@@ -11,3 +11,4 @@ figures/
 out/
 # local MCP / tooling config
 .mcp.json
+logs/

@@ -16,7 +16,7 @@ what XPBD can and cannot give.
 
 -> data/newton_friction.npz
 
-Run on Colab/Kaggle (CUDA):  python -m newton_run.run_friction
+Run on Colab (CUDA):  python -m newton_run.run_friction
 
 NOTE: ground-plane and particle-pinning calls are marked TODO[verify-on-colab].
 """
