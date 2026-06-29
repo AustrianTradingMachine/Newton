@@ -100,6 +100,12 @@ SIM_SUBSTEPS_EXPLICIT = 32
 MAX_FRAMES = 600                 # hard cap on the settling loop
 SETTLE_KE_TOL = 1.0e-6           # kinetic energy threshold to call it settled
 MIN_SETTLE_FRAMES = 60           # never stop before this many frames
+# Per-frame velocity damping to relax the dynamic solver to STATIC equilibrium.
+# Suddenly applying full gravity makes the soft block ring (under-damped); this
+# drains the kinetic energy each frame so it settles in a few periods. It does
+# NOT change the equilibrium (at rest v~0, so the factor does nothing there) --
+# it only removes the transient so we measure the settled state, not a snapshot.
+SETTLE_VEL_DAMP = 0.97
 
 # Tolerance (as a fraction of CELL) for picking nodes that lie on a face
 FACE_TOL_FRAC = 0.25

@@ -113,7 +113,7 @@ def _make_solver(solver_name, model, iterations):
 def simulate(solver_name="xpbd", iterations=params.XPBD_ITERATIONS,
              substeps=params.SIM_SUBSTEPS, max_frames=params.MAX_FRAMES,
              settle_tol=params.SETTLE_KE_TOL, min_frames=params.MIN_SETTLE_FRAMES,
-             device=None, verbose=True):
+             vel_damp=params.SETTLE_VEL_DAMP, device=None, verbose=True):
     """Run one hanging-block settle and return a result dict (numpy).
 
     Caller is responsible for ``wp.init()`` (so this can be looped cheaply by the
@@ -158,6 +158,13 @@ def simulate(solver_name="xpbd", iterations=params.XPBD_ITERATIONS,
                 model.collide(state_0, contacts)
                 solver.step(state_0, state_1, control, contacts, sim_dt)
                 state_0, state_1 = state_1, state_0
+
+            # quasi-static relaxation: drain kinetic energy so the block settles
+            # to its STATIC equilibrium instead of ringing under the sudden load
+            if vel_damp < 1.0:
+                qd = state_0.particle_qd.numpy()
+                qd *= vel_damp
+                state_0.particle_qd.assign(qd)
 
             q_now = state_0.particle_q.numpy()
             ke = kinetic_energy(model, state_0)
