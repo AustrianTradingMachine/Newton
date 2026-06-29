@@ -1,0 +1,13 @@
+{
+  "id": "REPLACE_WITH_KAGGLE_USERNAME/newton-vs-fem",
+  "title": "Newton vs FEM (soft-body)",
+  "code_file": "00_setup_kaggle.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["REPLACE_WITH_KAGGLE_USERNAME/newton-vs-fem-src"],
+  "competition_sources": [],
+  "kernel_sources": []
+}

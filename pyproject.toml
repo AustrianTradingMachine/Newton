@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "newton-vs-fem"
+version = "0.1.0"
+description = "Newton (XPBD) vs. FEniCSx (FEM) soft-body comparison"
+requires-python = ">=3.10"
+# Only the lightweight, pip-installable deps are listed here. The heavy
+# simulators are installed separately (see 00_setup_colab.ipynb / requirements.txt):
+#   - Newton/Warp : pip install "newton[examples]"
+#   - FEniCSx     : fem-on-colab installer (or conda-forge fenics-dolfinx)
+dependencies = [
+    "numpy",
+    "matplotlib",
+]
+
+# Explicit package list: flat layout has several top-level packages, so we list
+# them rather than relying on auto-discovery (which errors on multiple roots).
+[tool.setuptools]
+packages = ["common", "newton_run", "fenics_run", "compare"]

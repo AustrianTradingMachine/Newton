@@ -1,0 +1,13 @@
+.venv-check/
+__pycache__/
+*.pyc
+.idea/
+.DS_Store
+*.egg-info/
+build/
+# generated simulation artefacts (produced by the runs, not source)
+data/
+figures/
+out/
+# local MCP / tooling config
+.mcp.json
