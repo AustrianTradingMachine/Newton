@@ -40,29 +40,43 @@ valid JSON (`nbformat`), and `compare/scene.py` renders synthetic tet grids head
 
 ## Tier 2 — observed on Colab, recorded with provenance
 
-These are **measurements**, not eternal claims. They were produced on the Colab/A100 +
-dolfinx 0.11.0 stack and are reported with their context. They are **not** a
-substitute for a Tier-1 test, and the most recent set predates the file/structure
-rename — so they are **pending a clean re-run** on the renamed pipeline.
+These are **measurements**, not eternal claims. **Provenance:** a full Colab run on
+**2026-06-30**, Colab A100 (high-RAM), **dolfinx 0.11.0.post0**, committed with this repo
+(`data/*.npz`, `figures/*`, `logs/summary.txt`). Solver budgets: XPBD 32 substeps × 10 iters;
+VBD 10 substeps × 50 iters; SemiImplicit 32 substeps. They are **not** a substitute for a
+Tier-1 test, and are re-recorded per run.
 
-- **Hanging bar, FEM tip deflection** (earlier session): tet ≈ 43.2 mm, hex ≈ 43.4 mm,
-  vs. the analytic 1-D bar ≈ 44.3 mm — i.e. a few-percent gap consistent with the
-  3-D/Poisson correction the 1-D formula omits. The hex (locking-free) result sitting
-  closest to analytic is the expected ordering.
-- **Hanging bar, XPBD softness:** an early run came out far too soft because the
-  dynamic solver was under-damped and never settled (it was ringing, not balanced).
-  Adding per-frame velocity damping (`SETTLE_VEL_DAMP = 0.97`) drains the transient KE
-  so the measured state is the static equilibrium. Whether the *remaining* XPBD
-  softness is genuine positional-solver compliance is exactly what the convergence
-  study (the equilibrium-residual RMS vs. budget, and the tip ratio) is there to
-  quantify — on a fresh GPU run with the current code. (The differentiable θ\* fit is a
-  *separate* tool that characterises the **SemiImplicit** solver vs. FEM, **not** XPBD;
-  see the honesty rules below.)
+**Hanging bar — tip vertical drop** (max downward displacement over free nodes; source
+`figures/hanging_bar_report.txt`):
+
+| solver / reference | tip [mm] | ratio vs FEM tet |
+|---|---|---|
+| FEM tet | 43.20 | 1.00 (node-for-node reference) |
+| FEM hex | 43.40 | — (independent mesh) |
+| analytic 1-D | 44.30 | — (self-weight bar) |
+| Newton XPBD | 158.98 | 3.68 |
+| Newton VBD | 139.53 | 3.23 |
+| Newton SemiImplicit | 84.99 | 1.97 |
+
+The FEM few-percent gap to the analytic bar is the 3-D/Poisson correction; the hex
+(locking-free) result sits closest to analytic, as expected. All three Newton solvers settle
+far softer at this budget — XPBD because it projects positions and never reaches a force
+balance (finite equilibrium residual), VBD because its block Gauss-Seidel has not converged on
+this slender bar at 50 iters, SemiImplicit (closest) being force-based. The differentiable θ\*
+fit is a *separate* tool characterising **SemiImplicit** vs. FEM, **not** XPBD.
+
+**FEM validated against the analytic anchors** (same run):
+
+- **friction:** plateau F = 74.97 N vs Coulomb μ·W = 75.32 N, and N = 250.69 N vs weight
+  W = 251.05 N (both < 0.5 %).
+- **material (uniaxial stress):** FEM matches the closed-form Neo-Hookean stress to < 0.3 %
+  across λ ∈ [0.7, 1.5].
+- **convergence:** the FEM tip refines 40.05 → 43.68 mm toward a mesh-independent limit near
+  the analytic 44.30 mm.
 
 > Reproduce Tier 2 yourself: run `00_setup.ipynb` §1–§4 (setup), then the scenarios §5–§11
 > — each one streams its result and appends to `logs/summary.txt` (the OK/ERR health report) —
-> then the `10/15/20/25/30/40_*` notebooks. Numbers will be re-recorded here with the run date once the renamed
-> pipeline has been executed on Colab.
+> then the `10/15/20/25/30/40_*` notebooks.
 
 ## Tier 3 — open / still being confirmed on Colab
 

@@ -26,8 +26,9 @@ import os
 # Paths (everything resolved relative to the repository root)
 # This file lives at src/common/params.py, so the repo root is found by walking
 # up to the directory that holds pyproject.toml -- robust to the src/ layout and
-# overridable via environment variables. data/ and figures/ are auto-created by
-# the runs (they are git-ignored scratch directories, not committed source).
+# overridable via environment variables. data/, figures/ and logs/ are auto-created by
+# the runs and intentionally TRACKED, so a reference Colab run ships with the repo
+# (third parties can inspect the results without a GPU); only out/ etc. stay git-ignored.
 # --------------------------------------------------------------------------
 def _find_repo_root(start: str) -> str:
     p = os.path.dirname(os.path.abspath(start))

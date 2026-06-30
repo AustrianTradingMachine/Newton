@@ -101,13 +101,13 @@ def main():
         tets = model.tet_indices.numpy()
         masses = model.particle_mass.numpy()
 
-        fps = 60
+        fps = params.FPS
         substeps = 32
         sim_dt = (1.0 / fps) / substeps
         n_frames = int(round(params.DROP_DURATION * fps))
 
         hist = []  # t, sphere_z, penetration, U_strain, KE
-        best_pen, scene_q, scene_c = -1.0, rest, np.array([cx, cy, params.DROP_SPHERE_Z0], float)
+        lowest_z, scene_q, scene_c = float("inf"), rest, np.array([cx, cy, params.DROP_SPHERE_Z0], float)
         for frame in range(n_frames):
             for _ in range(substeps):
                 state_0.clear_forces()
@@ -121,8 +121,8 @@ def main():
             U = en.strain_energy(rest, q, tets)
             ke = en.kinetic_energy(masses, state_0.particle_qd.numpy())
             hist.append((frame / fps, float(c[2]), pen, U, ke))
-            if pen > best_pen:                      # keep the deepest-impact frame for the 3D render
-                best_pen, scene_q, scene_c = pen, q.copy(), np.array(c, dtype=float)
+            if float(c[2]) < lowest_z:              # deepest impact = sphere centre at its lowest point
+                lowest_z, scene_q, scene_c = float(c[2]), q.copy(), np.array(c, dtype=float)
             if frame % 5 == 0:
                 print(f"[drop-newton] t={frame / fps:.3f}s  sphere_z={c[2]:.3f}  pen={pen * 1000:.2f}mm  "
                       f"U={U:.3g} KE={ke:.3g}")

@@ -184,7 +184,7 @@ def main():
         control = model.control()
         contacts = model.contacts()
 
-        fps = 60
+        fps = params.FPS
         substeps = 32
         sim_dt = (1.0 / fps) / substeps
 

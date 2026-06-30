@@ -82,7 +82,7 @@ def main():
         rest = model.particle_q.numpy()
         tets = model.tet_indices.numpy()
         masses = model.particle_mass.numpy()
-        tol = 0.25 * h
+        tol = params.FACE_TOL_FRAC * h
         top = np.where(rest[:, 2] > rest[:, 2].max() - tol)[0]
         bottom = np.where(rest[:, 2] < rest[:, 2].min() + tol)[0]
         rest_top = rest[top].copy()
@@ -104,7 +104,7 @@ def main():
         control = model.control()
         contacts = model.contacts()
 
-        fps = 60
+        fps = params.FPS
         substeps = 32
         sim_dt = (1.0 / fps) / substeps
 

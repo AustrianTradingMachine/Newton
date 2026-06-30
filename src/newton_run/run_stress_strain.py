@@ -65,7 +65,7 @@ def main():
         tets = model.tet_indices.numpy()
 
         # all boundary nodes (any outer face) -> pinned and driven affinely
-        tol = 0.25 * h
+        tol = params.FACE_TOL_FRAC * h
         bnd = np.where((rest[:, 0] < tol) | (rest[:, 0] > Lx - tol)
                        | (rest[:, 1] < tol) | (rest[:, 1] > Ly - tol)
                        | (rest[:, 2] < tol) | (rest[:, 2] > Lz - tol))[0]
@@ -73,7 +73,7 @@ def main():
         inv[bnd] = 0.0
         model.particle_inv_mass = wp.array(inv, dtype=wp.float32, device=model.device)
 
-        fps = 60
+        fps = params.FPS
         substeps = 32
         sim_dt = (1.0 / fps) / substeps
 

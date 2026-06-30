@@ -7,7 +7,7 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 
 Same mesh, same material parameters (Lamé μ, λ), same gravity — *only the solver differs* (the FEM side uses a compressible Neo-Hookean law, Newton an StVK/co-rotational one at the same μ, λ — equal at small strain). The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Headline (hanging bar):** at a fast budget all three Newton solvers settle noticeably **softer** than the FEM/analytic answer — the explicit solver is closest, and the implicit **VBD does not automatically track FEM**. Exact tip ratios with provenance: **[docs/STATUS.md](docs/STATUS.md)**; the *why* (XPBD's force-balance residual vs. VBD's unconverged iterations): [`10_hanging_bar`](10_hanging_bar.ipynb).
+> **Key result (hanging bar):** at a fast budget all three Newton solvers settle noticeably **softer** than the FEM/analytic answer — the explicit solver is closest, and the implicit **VBD does not automatically track FEM**. Exact tip ratios with provenance: **[docs/STATUS.md](docs/STATUS.md)**; the *why* (XPBD's force-balance residual vs. VBD's unconverged iterations): [`10_hanging_bar`](10_hanging_bar.ipynb).
 
 ### The references are layered: analytic → FEM → Newton
 

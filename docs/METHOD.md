@@ -26,8 +26,9 @@ stress, not the whole deformed body.)
 
 Gravity is set **explicitly** on the Newton builder (`gravity=-GRAVITY`) because
 Newton's default is −9.81; this matches FEM to the same constant. The resulting
-tip strain is ≈ 2.8 % — small enough that linear bar theory is a meaningful anchor,
-large enough that the nonlinear terms are exercised. (μ is the **shear modulus** —
+**nominal (average) axial strain** is ≈ 2.8 % (tip elongation / length); the *local* axial
+strain is zero at the free tip and peaks at ≈ 5.5 % at the clamp (`ρgL/E`). Small enough that
+linear bar theory is a meaningful anchor, large enough that the nonlinear terms are exercised. (μ is the **shear modulus** —
 resistance to change of shape; λ sets the **volumetric stiffness** — resistance to
 change of volume; the row above converts them to the equivalent Young's modulus E and
 Poisson ratio ν.)
@@ -168,11 +169,14 @@ same quantities for *either* solver from `(rest_q, final_q, tets)`:
   free-node residual ≈ 0; for XPBD it is finite and measures how far the *projected*
   state is from the *material's* force balance. At the clamped nodes, `−Σ r_z` is the
   support reaction, which must equal the total weight `ρgV` (≈ 565 N for this block)
-  — a built-in consistency check. (For Newton, `r` is computed with the Neo-Hookean ψ
-  above, *not* the co-rotational/StVK law Newton actually integrated, so it folds a
-  small constitutive-mismatch term — bounded by the ≈ 2.8 % tip strain — into the
-  otherwise pure solve-vs-project gap; the material test isolates that constitutive
-  difference on its own.)
+  — a built-in consistency check, but **only at a true force balance**: the identity holds at
+  equilibrium, so for the Newton solvers the reaction departs from the weight by as much as their
+  settled state departs from balance (XPBD ≈ 0.4×, VBD ≈ 2.5×, explicit ≈ 1.6× the weight) — that
+  mismatch *is* the non-equilibrium signature, not a failing check; only FEM matches it. (For
+  Newton, `r` is also computed with the Neo-Hookean ψ above, *not* the co-rotational/StVK law Newton
+  actually integrated, so it folds a small constitutive-mismatch term — bounded by the *local*
+  strain, ≈ 5.5 % at the clamp, not the 2.8 % nominal average — into the otherwise pure
+  solve-vs-project gap; the material test isolates that constitutive difference on its own.)
 
 ### The honesty backbone: `tests/test_energies.py`
 

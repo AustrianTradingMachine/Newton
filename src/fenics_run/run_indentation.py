@@ -60,7 +60,7 @@ def _run(cell_name, penalty_factor, method, comm):
     Lx, Ly, Lz = nx * h, ny * h, nz * h
     R = params.INDENT_SPHERE_R
     cx, cy = Lx / 2.0, Ly / 2.0
-    tol = 0.25 * h
+    tol = params.FACE_TOL_FRAC * h
 
     msh = create_box(comm, [np.array([0.0, 0.0, 0.0]), np.array([Lx, Ly, Lz])],
                      [nx, ny, nz], cell_type)
@@ -114,18 +114,24 @@ def _run(cell_name, penalty_factor, method, comm):
     strain_form = fem.form(psi * ufl.dx)
     contact_energy_form = fem.form(0.5 * kn * penetration_ufl ** 2 * ds(TOP))
 
-    # interpolation expressions: max penetration tracker and the Uzawa update.
+    # Uzawa multiplier update interpolation (a genuine P1 nodal field).
     # dolfinx 0.11: element.interpolation_points is an attribute (array), not a call.
     ip = Vs.element.interpolation_points
-    pen_expr = fem.Expression(penetration_ufl, ip)
     lam_update = fem.Expression(pressure, ip)
-    pen_func = fem.Function(Vs)
     lam_tmp = fem.Function(Vs)
 
-    def max_penetration():
-        pen_func.interpolate(pen_expr)
-        local = float(pen_func.x.array.max()) if pen_func.x.array.size else 0.0
-        return comm.allreduce(local, op=MPI.MAX)
+    # Contact penetration measured at FACET QUADRATURE points, NOT P1 vertices: the penalty
+    # pins the vertices onto the sphere, so a nodal max reads ~0 while the flat P1 facet still
+    # penetrates the curved sphere between vertices (sagitta ~ h^2/8R). We report the L2-RMS of
+    # <-g>+ over the contact facet and base the Uzawa termination on it -- so AL actually iterates.
+    # (The old nodal max read 0.000 mm and stopped the Uzawa loop after one solve, which made AL
+    #  numerically identical to plain penalty.)
+    area_top = comm.allreduce(fem.assemble_scalar(fem.form(fem.Constant(msh, 1.0) * ds(TOP))), op=MPI.SUM)
+    pen_sq_form = fem.form(penetration_ufl ** 2 * ds(TOP))
+
+    def rms_penetration():
+        integ = comm.allreduce(fem.assemble_scalar(pen_sq_form), op=MPI.SUM)
+        return (integ / area_top) ** 0.5 if area_top > 0.0 else 0.0
 
     n_aug = params.INDENT_AUG_ITERS if is_aug else 1
     n_steps = params.INDENT_LOAD_STEPS
@@ -143,22 +149,22 @@ def _run(cell_name, penalty_factor, method, comm):
                 lam_tmp.interpolate(lam_update)         # p = <lam - kn*g>+
                 lam.x.array[:] = lam_tmp.x.array         # lambda <- p  (Uzawa update)
                 lam.x.scatter_forward()
-            if max_penetration() < params.INDENT_AUG_PEN_TOL:
+            if rms_penetration() < params.INDENT_AUG_PEN_TOL:
                 break
         fz = comm.allreduce(fem.assemble_scalar(force_form), op=MPI.SUM)
         deltas.append(delta)
         f_fem.append(abs(fz))
         e_strain.append(comm.allreduce(fem.assemble_scalar(strain_form), op=MPI.SUM))
         e_contact.append(comm.allreduce(fem.assemble_scalar(contact_energy_form), op=MPI.SUM))
-        penetration.append(max_penetration())
+        penetration.append(rms_penetration())
         flag = "" if converged else "  [WARN not converged]"
         aug_str = f"  aug={a + 1}" if is_aug else ""      # Uzawa count only meaningful for AL
         print(f"[indent-fem:{label}] delta={delta * 1000:6.2f} mm{aug_str}  F={abs(fz):.4g} N  "
-              f"pen={penetration[-1] * 1000:.3f} mm{flag}")
+              f"pen(rms)={penetration[-1] * 1000:.3f} mm{flag}")
     wall_time = time.perf_counter() - t0
     print(f"[indent-fem:{label}] done: {n_steps} steps in {wall_time:.2f} s "
           f"({wall_time / n_steps * 1000:.0f} ms/step)  "
-          f"F_max={f_fem[-1]:.4g} N  max_pen={penetration[-1] * 1000:.3f} mm")
+          f"F_max={f_fem[-1]:.4g} N  rms_pen={penetration[-1] * 1000:.3f} mm")
 
     line_x = np.linspace(0.0, Lx, 81)
     line_pts = np.column_stack([line_x, np.full_like(line_x, cy), np.full_like(line_x, Lz)])

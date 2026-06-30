@@ -74,7 +74,7 @@ def test_uniaxial_stress_matches_closed_form():
         final[:, 2] *= lam                                  # affine: F = diag(1,1,lam) per tet
         sig_fem = en.mean_axial_first_piola(rest, final, tets)
         sig_ana = float(en.neohookean_uniaxial_strain_stress(lam))
-        assert abs(sig_fem - sig_ana) <= 1.0e-9 * (abs(sig_ana) + 1.0), \
+        assert abs(sig_fem - sig_ana) <= 1.0e-12 * (abs(sig_ana) + 1.0), \
             f"lambda={lam}: averaged P_zz {sig_fem:.6g} != closed form {sig_ana:.6g}"
 
 

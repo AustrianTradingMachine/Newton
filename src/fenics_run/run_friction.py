@@ -59,7 +59,7 @@ def main():
     nx, ny, nz = params.FRICTION_DIM
     h = params.FRICTION_CELL
     Lx, Ly, Lz = nx * h, ny * h, nz * h
-    tol = 0.25 * h
+    tol = params.FACE_TOL_FRAC * h
     mu = params.FRICTION_MU
 
     msh = create_box(comm, [np.array([0.0, 0.0, 0.0]), np.array([Lx, Ly, Lz])],

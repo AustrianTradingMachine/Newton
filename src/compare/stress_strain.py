@@ -63,9 +63,12 @@ def main():
     ana = en.neohookean_uniaxial_strain_stress(lam)
 
     def report(name, sig):
-        rel = np.abs(sig - ana) / (np.abs(ana) + 1.0)
-        print(f"[stress] {name}: max rel. deviation vs analytic = {rel.max() * 100:.2f}% "
-              f"(at lambda={lam[np.argmax(rel)]:.2f}); at lambda={lam[-1]:.2f}: "
+        # max ABSOLUTE deviation in kPa -- a relative metric divides by ~0 at the lambda=1
+        # stress zero-crossing and reports a meaningless ~600% there; absolute is faithful.
+        abs_dev = np.abs(sig - ana)
+        i = int(np.argmax(abs_dev))
+        print(f"[stress] {name}: max abs. deviation vs analytic = {abs_dev[i] / 1e3:.3g} kPa "
+              f"(at lambda={lam[i]:.2f}); at lambda={lam[-1]:.2f}: "
               f"{sig[-1] / 1e3:.3g} vs {ana[-1] / 1e3:.3g} kPa")
 
     if fem is not None:

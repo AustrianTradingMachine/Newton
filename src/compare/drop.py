@@ -40,6 +40,17 @@ from compare import style
 # inline); main() sets Agg before saving.
 
 
+def scene_run(newtons):
+    """Pick the Newton run whose stored scene sphere sits lowest (deepest impact) for the 3-D
+    render -- the canonical XPBD run may barely impact, so render whichever solver indents most."""
+    runs = [(float(nd["sphere_c"][2]), nd, label)
+            for label, nd, *_ in newtons if "sphere_c" in nd.files]
+    if not runs:
+        return (newtons[0][1], newtons[0][0]) if newtons else (None, None)
+    _z, nd, label = min(runs, key=lambda r: r[0])
+    return nd, label
+
+
 def make_scene(nd, label):
     """3-D scene of the deepest impact for one Newton run -> Figure (None if no mesh saved)."""
     if "tet_indices" not in nd.files:
@@ -57,8 +68,12 @@ def make_scene(nd, label):
     return fig
 
 
-def make_series(newtons, fem_hist, col, ylabel, title, scale=1.0):
-    """Overlay one history column for every present Newton solver (+ FEM Newmark) -> Figure."""
+def make_series(newtons, fem_hist, col, ylabel, title, scale=1.0, logy=False):
+    """Overlay one history column for every present Newton solver (+ FEM Newmark) -> Figure.
+
+    logy=True puts the y-axis on a log scale (impact spikes span orders of magnitude;
+    non-positive samples are masked by matplotlib).
+    """
     fig = plt.figure(figsize=(6, 4))
     for label, nd, color, *_ in newtons:
         hh = nd["history"]
@@ -66,8 +81,10 @@ def make_series(newtons, fem_hist, col, ylabel, title, scale=1.0):
     if fem_hist is not None:
         plt.plot(fem_hist[:, 0], fem_hist[:, col] * scale,
                  label=f"{style.LABEL['fem']} Newmark", color=style.COLOR["fem"])
+    if logy:
+        plt.yscale("log")
     plt.xlabel("time [s]"); plt.ylabel(ylabel); plt.title(title)
-    plt.legend(); plt.grid(alpha=0.3); plt.tight_layout()
+    plt.legend(); plt.grid(alpha=0.3, which="both"); plt.tight_layout()
     return fig
 
 
@@ -94,16 +111,16 @@ def main():
 
     figures = []
     if newtons:
-        figures.append((make_scene(newtons[0][1], newtons[0][0]), "drop_scene.png"))
+        figures.append((make_scene(*scene_run(newtons)), "drop_scene.png"))
     figures += [
         (make_series(newtons, fe, 1, "sphere centre height [m]",
                      "Drop: sphere trajectory (impact & rebound)"), "drop_sphere_z.png"),
         (make_series(newtons, fe, 2, "max penetration [mm]",
-                     "Drop: sphere/block penetration", scale=1000.0), "drop_penetration.png"),
+                     "Drop: sphere/block penetration", scale=1000.0, logy=True), "drop_penetration.png"),
         (make_series(newtons, fe, 3, "block strain energy [J]",
-                     "Drop: block internal energy"), "drop_strain_energy.png"),
+                     "Drop: block internal energy", logy=True), "drop_strain_energy.png"),
         (make_series(newtons, fe, 4, "block kinetic energy [J]",
-                     "Drop: block kinetic energy"), "drop_kinetic_energy.png"),
+                     "Drop: block kinetic energy", logy=True), "drop_kinetic_energy.png"),
         (make_contact_force(fe), "drop_contact_force.png"),
     ]
     for fig, name in figures:

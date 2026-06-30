@@ -51,7 +51,7 @@ def main():
     Lx, Ly, Lz = nx * h, ny * h, nz * h
     R = params.DROP_SPHERE_R
     cx, cy = Lx / 2.0, Ly / 2.0
-    tol = 0.25 * h
+    tol = params.FACE_TOL_FRAC * h
 
     msh = create_box(comm, [np.array([0.0, 0.0, 0.0]), np.array([Lx, Ly, Lz])],
                      [nx, ny, nz], CellType.hexahedron)

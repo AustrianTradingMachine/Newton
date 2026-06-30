@@ -61,7 +61,7 @@ tests/test_energies.py          validates the diagnostics (no GPU/FEM needed)
 40_friction.ipynb               Coulomb friction force / work / slip
 ```
 
-Data flow: `newton_run/run_hanging_bar` produces the **shared mesh** (`data/mesh.npz`) → `fenics_run/run_hanging_bar` evaluates its FEM solution at Newton's nodes → results land in `data/*.npz` → `compare/*` writes figures to `figures/`. `data/`, `figures/`, `logs/` are git-ignored.
+Data flow: `newton_run/run_hanging_bar` produces the **shared mesh** (`data/mesh.npz`) → `fenics_run/run_hanging_bar` evaluates its FEM solution at Newton's nodes → results land in `data/*.npz` → `compare/*` writes figures to `figures/`. `data/`, `figures/`, `logs/` are intentionally tracked, so a reference Colab run ships with the repo (only scratch dirs like `out/` are git-ignored).
 
 ## The three Newton solvers (hanging-bar scenario)
 
