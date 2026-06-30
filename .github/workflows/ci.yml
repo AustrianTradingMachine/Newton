@@ -4,7 +4,7 @@ name: CI
 # no fem-on-colab, so it cannot run Newton (Warp) or FEniCSx (dolfinx). CI therefore
 # covers exactly the GPU-free surface: ruff lint, the pure-numpy diagnostic tests
 # (tests/), and that the package builds. The simulation stages are run on Colab
-# (see 00_setup_colab.ipynb).
+# (see 00_setup.ipynb).
 
 on:
   push:
@@ -15,9 +15,9 @@ jobs:
   lint-test-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
