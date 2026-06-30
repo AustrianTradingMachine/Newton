@@ -113,16 +113,18 @@ def newton_shape_cfg(builder_cls):
 
 
 def pin_bottom(model):
-    """Clamp the slab's bottom face by zeroing those particles' inverse mass."""
-    import warp as wp
+    """Clamp the slab's bottom face for every solver (zero mass + inv_mass).
+
+    Uses the shared pin so VBD/SemiImplicit hold the clamp too, not just XPBD (VBD's
+    elasticity solve fixes a vertex only at particle_mass==0). See
+    newton_run._solver.pin_particles.
+    """
+    from newton_run._solver import pin_particles
 
     rest = model.particle_q.numpy()
     tol = 0.25 * params.INDENT_CELL
     bottom = np.where(rest[:, 2] < rest[:, 2].min() + tol)[0]
-    inv = model.particle_inv_mass.numpy()
-    inv[bottom] = 0.0
-    # TODO[verify-on-colab]: attribute name `particle_inv_mass`
-    model.particle_inv_mass = wp.array(inv, dtype=wp.float32, device=model.device)
+    pin_particles(model, bottom)
     return rest, bottom
 
 

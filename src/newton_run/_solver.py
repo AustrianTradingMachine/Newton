@@ -26,6 +26,31 @@ from __future__ import annotations
 SOLVERS = ("xpbd", "vbd", "semi_implicit")
 
 
+def pin_particles(model, fixed_nodes) -> None:
+    """Clamp the given particles so EVERY solver treats them as immovable.
+
+    The subtlety that makes VBD work: XPBD reads ``particle_inv_mass`` everywhere, but
+    VBD's elasticity solve fixes a vertex only when ``particle_mass == 0`` -- it ignores
+    inv_mass there. Zeroing inv_mass alone pins the clamp for XPBD but NOT for VBD (the
+    clamped face is then dragged by neighbour forces and the body sinks under gravity
+    without ever settling). So we zero BOTH mass and inv_mass -- the same pin Newton's own
+    ``examples/softbody/example_softbody_hanging.py`` produces via
+    ``add_soft_grid(fix_*=True)`` (mass = 0 at the fixed face -> finalize maps it to
+    inv_mass = 0). Harmless to XPBD/SemiImplicit, which already key off inv_mass. Written
+    in place with ``.assign()`` so a solver constructed afterwards reads the update.
+
+    TODO[verify-on-colab]: attribute names particle_inv_mass / particle_mass are from
+    Newton main and may shift between versions.
+    """
+    inv_mass = model.particle_inv_mass.numpy()
+    inv_mass[fixed_nodes] = 0.0
+    model.particle_inv_mass.assign(inv_mass)
+
+    mass = model.particle_mass.numpy()
+    mass[fixed_nodes] = 0.0
+    model.particle_mass.assign(mass)
+
+
 def needs_coloring(solver: str) -> bool:
     """Whether the solver needs a vertex-graph colouring (``builder.color()``).
 

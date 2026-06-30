@@ -84,13 +84,15 @@ def pick_fixed_nodes(rest_q: np.ndarray) -> np.ndarray:
 
 
 def pin_nodes(model, fixed_nodes: np.ndarray) -> None:
-    """Clamp nodes by zeroing their inverse mass (immovable in XPBD)."""
-    import warp as wp
+    """Clamp the clamped-face nodes for every solver (zero mass + inv_mass).
 
-    # TODO[verify-on-colab]: attribute name `particle_inv_mass` (warp.sim convention)
-    inv_mass = model.particle_inv_mass.numpy()
-    inv_mass[fixed_nodes] = 0.0
-    model.particle_inv_mass = wp.array(inv_mass, dtype=wp.float32, device=model.device)
+    Delegates to the shared pin so XPBD *and* VBD hold the clamp identically -- VBD's
+    elasticity solve keys off particle_mass==0, not inv_mass, so an inv_mass-only pin
+    let the bar sink under VBD. See newton_run._solver.pin_particles.
+    """
+    from newton_run._solver import pin_particles
+
+    pin_particles(model, fixed_nodes)
 
 
 def kinetic_energy(model, state) -> float:

@@ -44,7 +44,7 @@ from compare import energies as en
 
 
 def main():
-    from newton_run._solver import SOLVERS, make_solver, needs_coloring
+    from newton_run._solver import SOLVERS, make_solver, needs_coloring, pin_particles
 
     parser = argparse.ArgumentParser(description="Newton sliding-block friction")
     parser.add_argument("--device", default=None)
@@ -87,10 +87,10 @@ def main():
         bottom = np.where(rest[:, 2] < rest[:, 2].min() + tol)[0]
         rest_top = rest[top].copy()
 
-        # pin the top face (kinematic drag platen): inv_mass = 0
-        inv = model.particle_inv_mass.numpy()
-        inv[top] = 0.0
-        model.particle_inv_mass = wp.array(inv, dtype=wp.float32, device=model.device)
+        # pin the top face (kinematic drag platen) for every solver: zero mass + inv_mass
+        # (VBD holds a vertex only at particle_mass==0); set_top_drag then prescribes its
+        # position each step.
+        pin_particles(model, top)
 
         # Coulomb friction at the ground; normal stiffness is uncalibrated (the point)
         model.soft_contact_ke = 1.0e3
