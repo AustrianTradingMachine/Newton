@@ -143,14 +143,21 @@ def _run(cell_name, penalty_factor, method, comm):
     for k in range(1, n_steps + 1):
         delta = params.INDENT_MAX * k / n_steps
         centre.value = np.array([cx, cy, Lz + R - delta], dtype=default_scalar_type)
+        prev_pen = None
         for a in range(n_aug):  # noqa: B007 -- `a` is the Uzawa count, reported after the loop
             n_it, converged = solve_status(problem, u)
             if is_aug:
                 lam_tmp.interpolate(lam_update)         # p = <lam - kn*g>+
                 lam.x.array[:] = lam_tmp.x.array         # lambda <- p  (Uzawa update)
                 lam.x.scatter_forward()
-            if rms_penetration() < params.INDENT_AUG_PEN_TOL:
+            pen = rms_penetration()
+            # Stop when penetration is small OR has stopped decreasing. It plateaus at the
+            # geometric P1-facet floor (~h^2/8R), which AL cannot reduce, so an absolute-only
+            # tolerance below that floor would pointlessly run every Uzawa iteration (the hex AL
+            # variant would balloon to hours). Convergence (<1% decrease) is the right criterion.
+            if pen < params.INDENT_AUG_PEN_TOL or (prev_pen is not None and prev_pen - pen < 0.01 * prev_pen):
                 break
+            prev_pen = pen
         fz = comm.allreduce(fem.assemble_scalar(force_form), op=MPI.SUM)
         deltas.append(delta)
         f_fem.append(abs(fz))
