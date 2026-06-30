@@ -129,7 +129,8 @@ FEM 43 mm / analytic 44 mm, for the per-solver reasons below.
 
 - **XPBD** is the canonical run (it owns the shared mesh). It enforces constraints
   by **projecting positions**, not by solving a force balance, so its settled state
-  leaves a finite **equilibrium residual** (§4) and reads slightly soft. This is the
+  leaves a finite **equilibrium residual** (§4) and reads soft — the softest of the
+  three at this budget (§3 intro). This is the
   expected behaviour of a fast positional solver, and the residual is how we measure
   it — not a bug.
 - **VBD** minimises the backward-Euler objective by block coordinate descent over a

@@ -60,9 +60,11 @@ The sphere is analytic: the signed gap `g = ‖(X+u) − c‖ − R` and the sur
   `kn = factor · E / cell`. Simple, but both the result and the residual penetration
   depend on the penalty stiffness `kn`.
 - **aug_lagrangian (Uzawa)** — keep a contact-pressure multiplier field `λ` and use
-  `p = ⟨λ − kn·g⟩₊`; after each inner nonlinear solve, update `λ ← p`. Iterating this
-  **outer loop** drives the penetration toward zero **without** pushing `kn → ∞`,
-  approaching the exact non-penetration constraint without that ill-conditioning. It
+  `p = ⟨λ − kn·g⟩₊`; after each inner nonlinear solve, update `λ ← p`. In principle this
+  **outer loop** reduces penetration **without** pushing `kn → ∞`. In this run, however, AL
+  converges in ~2 augmentations to the **same** residual as the stiff (`kn×50`) penalty —
+  both rms_pen 0.084 mm, bit-identical — because the stiff penalty already sits at the
+  residual floor; AL does not beat a stiff penalty here. It
   stays in pure UFL — `λ` is an interpolated field, not an extra global unknown, so
   there is **no saddle-point system** (`INDENT_AUG_ITERS = 8`,
   `INDENT_AUG_PEN_TOL = 10⁻⁵ m`).
@@ -77,13 +79,15 @@ share **identical nodes** — so only the element type and the contact method ch
 |---|---|---|
 | 1 | tet, kn×5, penalty | soft penalty → visible penetration, **plus** tet locking |
 | 2 | tet, kn×50, penalty | stiffer penalty → less penetration, still tet locking |
-| 3 | tet, kn×50, AL | Uzawa drives penetration ≈ 0 at the **same kn as #2**, still tet locking (#2 vs #3 = penalty vs AL at equal kn) |
-| 4 | **hex, kn×50, AL** | AL (penetration ≈ 0) on **locking-free hex** → the most accurate (same AL + kn as #3 → isolates the element/locking effect) |
+| 3 | tet, kn×50, AL | Uzawa reaches the **same** residual penetration as penalty #2 at equal kn (both rms_pen 0.084 mm, bit-identical; converges in ~2 augmentations), still tet locking (#2 vs #3 = penalty vs AL at equal kn) |
+| 4 | **hex, kn×50, AL** | AL on **locking-free hex** (rms_pen 0.079 mm) → the most accurate (same AL + kn as #3 → isolates the element/locking effect) |
 
 Per step the run records the **total contact force** (∫ p·n_z ds), the strain energy,
-the penalty (contact) energy `½ kn ⟨−g⟩₊²`, and the **max residual penetration**. The
-penetration plot is the clearest axis: penalty leaves a kn-dependent gap; AL collapses
-it to ≈ 0.
+the penalty (contact) energy `½ kn ⟨−g⟩₊²`, and the **rms residual penetration** (the
+root-mean-square of ⟨−g⟩₊ over the contact facets). The penetration plot is the clearest
+axis: the lever is the penalty stiffness `kn` — `kn×5` → `kn×50` cuts rms_pen 0.549 → 0.084 mm;
+at equal `kn`, AL matches the stiff penalty (both rms_pen 0.084 mm) rather than collapsing it
+to 0, and a ~0.08 mm rms geometric floor (flat facets vs the curved sphere) remains.
 
 ### The analytic anchor: Hertz
 
@@ -109,7 +113,10 @@ to integrate) makes it the easiest contact case for the swap. XPBD's contact sti
 knobs (`soft_contact_ke/kd/kf`) are set but are **largely ignored for the normal force**
 — that is exactly the point: XPBD has no calibrated contact force to report. So the
 comparison axis is the **deformed dimple** (top-surface displacement through the contact
-centre) and the **penetration**, not a force. The run also saves the deformed mesh +
+centre) and the **penetration**, not a force. On the 2026-06-30 run only **XPBD**
+geometrically resolves the contact (its positional projection hard-stops the slab out of the
+sphere, pen ≈ 0); the **VBD/SemiImplicit** soft_contact path is too soft, so the sphere
+sinks ≈ 33 mm into the 40 mm indent (strain energy ≈ 0.1 J vs XPBD's ≈ 13 J). The run also saves the deformed mesh +
 sphere at maximum indentation so
 [`compare/scene.py`](../src/compare/scene.py) can render the real dimple in 3-D.
 
@@ -160,14 +167,18 @@ The same block/sphere with `add_ground_plane` and a free rigid sphere
 time-series diagnostics and keeps the **deepest-impact frame** (deformed mesh + sphere
 centre) for the 3-D render. `compare/drop.py` overlays whichever solver runs are present
 and writes `drop_scene.png`; [`25_dynamic.ipynb`](../25_dynamic.ipynb) tells the story
-verdict-first. The **free** sphere makes the implicit VBD path the hardest /
-most version-sensitive here (two-way AVBD body integration; `TODO[verify-on-colab]`).
+verdict-first. The **free** sphere makes the implicit VBD path the hardest here (two-way
+AVBD body integration). On the 2026-06-30 run it works: **VBD** is the only solver with a
+genuine two-way impact (the sphere settles onto the block, pen ≈ 9 mm), while **XPBD** never
+drives the free sphere down and the **SemiImplicit** drop is numerically unstable (energy
+blow-up).
 
 **Honesty note.** The dynamic contact path is the least settled numerically: dt,
-penalty stiffness and damping all need tuning, and the FEM drop file flags its dynamic
-path `TODO[verify-on-colab]` (`fenics_run/run_drop.py`). The structure (Newmark +
-penalty + staggered rigid ODE) is standard; the specific constants are **observations
-pending a clean GPU/Colab run**, not verified results. See [STATUS.md](STATUS.md).
+penalty stiffness and damping all need tuning. The 2026-06-30 run produced a genuine FEM
+Newmark impact and a genuine VBD impact, but the **SemiImplicit drop still blows up** at
+this budget, and the FEM drop's dt/damping are not tuned to convergence. The structure
+(Newmark + penalty + staggered rigid ODE) is standard; the specific constants are
+**observations**, not verified results. See [STATUS.md](STATUS.md).
 
 ---
 

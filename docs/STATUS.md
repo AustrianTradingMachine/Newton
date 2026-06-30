@@ -54,7 +54,7 @@ Tier-1 test, and are re-recorded per run.
 | FEM tet | 43.20 | 1.00 (node-for-node reference) |
 | FEM hex | 43.40 | — (independent mesh) |
 | analytic 1-D | 44.30 | — (self-weight bar) |
-| Newton XPBD | 158.98 | 3.68 |
+| Newton XPBD | 158.86 | 3.68 |
 | Newton VBD | 139.53 | 3.23 |
 | Newton SemiImplicit | 84.99 | 1.97 |
 
@@ -65,12 +65,15 @@ balance (finite equilibrium residual), VBD because its block Gauss-Seidel has no
 this slender bar at 50 iters, SemiImplicit (closest) being force-based. The differentiable θ\*
 fit is a *separate* tool characterising **SemiImplicit** vs. FEM, **not** XPBD.
 
-**FEM validated against the analytic anchors** (same run):
+**FEM checked against the analytic anchors** (same run):
 
 - **friction:** plateau F = 74.97 N vs Coulomb μ·W = 75.32 N, and N = 250.69 N vs weight
   W = 251.05 N (both < 0.5 %).
-- **material (uniaxial stress):** FEM matches the closed-form Neo-Hookean stress to < 0.3 %
-  across λ ∈ [0.7, 1.5].
+- **material (uniaxial stress):** FEM reproduces the closed-form Neo-Hookean stress to ~1e-12
+  relative (max abs dev 5.24e-12 kPa at λ=0.75) across λ ∈ [0.7, 1.5]. This agreement is
+  *expected*, not a constitutive test of FEM: the confined test prescribes an affine deformation
+  gradient F (material-independent) and both sides evaluate the same Neo-Hookean 1st-Piola
+  formula. The StVK-vs-Neo-Hookean signal is the θ\* fit, not this test.
 - **convergence:** the FEM tip refines 40.05 → 43.68 mm toward a mesh-independent limit near
   the analytic 44.30 mm.
 
@@ -78,25 +81,36 @@ fit is a *separate* tool characterising **SemiImplicit** vs. FEM, **not** XPBD.
 > — each one streams its result and appends to `logs/summary.txt` (the OK/ERR health report) —
 > then the `10/15/20/25/30/40_*` notebooks.
 
-## Tier 3 — open / still being confirmed on Colab
+## Tier 3 — what the latest run confirmed, and what is still open
 
-Paths marked `TODO[verify-on-colab]` in the source. They follow the public Newton /
-dolfinx examples, but the exact API names or numerical constants can shift between
-versions and have **not** been re-run on the current stack. The marked files:
+Paths that were previously marked `TODO[verify-on-colab]` in the source were **all re-run on
+the 2026-06-30 Colab stack** (Warp 1.14.0 / dolfinx 0.11.0.post0) and produced the committed
+data/figures cited in Tier 2 — so the open question has moved from "does the API even run" to
+"is the result numerically settled". What the run established:
 
-| file | what is unconfirmed |
+- **All three Newton solvers run every scenario.** The hanging bar (`particle_inv_mass`
+  pinning), indentation (kinematic body + pinning), friction (`add_ground_plane` + pinning) and
+  the differentiable θ\* fit (`finalize(requires_grad=True)`, Tape/optimiser) all produced finite
+  results; the θ\* fit converged (θ\* = 1.79, loss 0.275 → 2.1e-4).
+- **The FEM scenario scripts run.** The tet node-for-node reference (43.20 mm, via the dolfinx
+  geometry API), FEM friction (component Dirichlet, F = 74.97 N) and the FEM Newmark drop
+  (genuine impact, pen 1.99 mm) all produced results.
+- **The VBD/SemiImplicit soft-contact path runs on the pinned Newton.** Indentation, drop and
+  friction all record VBD and SemiImplicit results — the AVBD + `rigid_body_particle_contact_buffer_size`
+  path is no longer the "only XPBD records a result" risk; in the drop, VBD genuinely impacts the
+  free sphere two-way (pen 9.35 mm).
+
+What is **still numerically open** (quality, not wiring):
+
+| item | what is unsettled |
 |---|---|
-| `newton_run/run_hanging_bar.py` | `particle_inv_mass` pinning attribute (Warp/sim convention) |
-| `newton_run/run_indentation.py` | kinematic-body call + `particle_inv_mass` pinning |
-| `newton_run/run_friction.py` | `add_ground_plane` + particle pinning |
-| `newton_run/diffsim.py` | `finalize(requires_grad=True)`, Tape/optimiser, **learning rate needs tuning** |
-| `fenics_run/run_hanging_bar.py` | dolfinx geometry API (`bb_tree` / `compute_collisions_points` / `compute_colliding_cells`) |
-| `fenics_run/run_friction.py` | component Dirichlet via `V.sub(i).collapse()` |
-| `fenics_run/run_drop.py` | dynamic contact: dt / damping tuning, the no-Dirichlet dynamic tangent |
-| contact scenarios `--solver vbd / semi_implicit` | indentation/drop/friction now wire **all three** solvers on the shared `soft_contact` path (as Newton's own `example_rigid_soft_contact.py` does); unconfirmed is whether the **pinned** Newton supports the VBD soft/rigid-contact path (AVBD + `rigid_body_particle_contact_buffer_size`). On an older pin the VBD/SemiImplicit contact runs error and only XPBD records a result. The **drop** (free sphere, two-way AVBD) is the most version-sensitive; see CONTACT.md. |
+| **SemiImplicit drop** | numerically unstable at this dt/substep budget — the energy blows up (peak strain energy 7536 J vs FEM 3.4 J); the only clearly-broken numeric this run |
+| **FEM drop** (`fenics_run/run_drop.py`) | dt / damping are not tuned to convergence; the transient numbers are observations, not a settled benchmark |
+| **VBD / SemiImplicit indentation contact** | the `soft_contact` penalty is too soft — the sphere sinks ~33 mm through the 40 mm indent (strain energy ~0.1 J vs XPBD's ~13 J), so **XPBD** is the only Newton solver that geometrically resolves the indentation; the soft-contact stiffness for the implicit/explicit solvers is unsettled |
+| **θ\* fit** (`newton_run/diffsim.py`) | one converged fit characterising the **SemiImplicit** solver vs FEM (θ\* = 1.79); not cross-validated across budgets/scenarios |
 
-The dynamic **drop** and the **θ\* fit** are the least settled numerically and should
-be treated as work-in-progress until they have a clean Colab run.
+The source still carries `TODO[verify-on-colab]` markers on these paths; they now track this
+**numerical tuning**, not whether the API runs.
 
 ## Honesty rules (the standard this repo holds itself to)
 

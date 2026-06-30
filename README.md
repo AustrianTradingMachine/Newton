@@ -48,7 +48,7 @@ Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/
 
 ## The three Newton solvers
 
-- **XPBD** — positional projection; fast; leaves a finite equilibrium residual → reads slightly soft. The canonical run (writes the shared mesh).
+- **XPBD** — positional projection; fast; leaves a finite equilibrium residual → reads soft (the softest of the three Newton solvers at this budget, tip ratio ≈ 3.7× FEM). The canonical run (writes the shared mesh).
 - **VBD** — Vertex Block Descent; *implicit* (minimises the backward-Euler objective). In principle converges to the implicit solution *as iterations grow*; on the slender hanging bar at the budget used it still settles ~3× too soft (slow block-Gauss-Seidel propagation of the clamp).
 - **SemiImplicit** — explicit, force-based; the *differentiable* one → used by the `diffsim` θ\* fit and the material test.
 

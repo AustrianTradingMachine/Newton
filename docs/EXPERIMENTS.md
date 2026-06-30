@@ -84,8 +84,12 @@ This is **the** ground truth here, and it is the one backed to machine precision
 
 - **FEM** (`fenics_run/run_stress_strain.py`): prescribe the affine boundary, assemble
   the block's volume-averaged `P_zz`, compare to the closed form. The run prints the
-  **max relative deviation vs. analytic** — a direct measure of constitutive fidelity
-  into large strain. → `data/fem_stress_strain.npz`.
+  **max relative deviation vs. analytic**. Because the boundary is prescribed-affine, the
+  deformation gradient `F` is material-independent and both sides read stress from the same
+  Neo-Hookean 1st-Piola formula, so this deviation is near-zero by construction (max abs dev
+  5.24e-12 kPa) — a self-consistency check that FEM reproduces the prescribed deformation and
+  the closed-form stress, not a discriminating constitutive measurement. The
+  StVK-vs-Neo-Hookean signal is the θ\* fit (§4). → `data/fem_stress_strain.npz`.
 - **Newton** (`newton_run/run_stress_strain.py`): the **SemiImplicit** solver, all
   boundary nodes pinned to their affine positions, interior settled (gravity off);
   read the volume-averaged axial stress. **Honest scope:** with a fully prescribed
@@ -124,9 +128,10 @@ makes that explicit:
 
 For each it records tip drop, strain energy, the **free-node equilibrium-residual RMS**
 (the cleanest "have we converged?" measure — distance from the true force balance),
-and wall time. As the budget grows the residual falls and the tip approaches the
-implicit-FEM / analytic value: **XPBD converges toward the true equilibrium, at a
-cost.** The notebook [`30_convergence.ipynb`](../30_convergence.ipynb) overlays both
+and wall time. As the iteration budget grows the equilibrium residual falls (31.18 → 7.01 N) and the
+tip drops (361.88 → 105.54 mm), moving toward the FEM / analytic value without reaching
+it — even at 32 iters the tip is still ~2.4× the FEM tip, so more iterations narrow the
+gap but do not close it; the substep sweep is roughly flat (~158–180 mm). The notebook [`30_convergence.ipynb`](../30_convergence.ipynb) overlays both
 halves against the analytic and FEM tip references.
 
 ---
