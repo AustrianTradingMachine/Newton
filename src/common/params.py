@@ -62,7 +62,27 @@ NEWTON_VBD_NPZ = os.path.join(DATA_DIR, "newton_result_vbd.npz")    # hanging ba
 NEWTON_CONV_NPZ = os.path.join(DATA_DIR, "newton_convergence.npz")  # hanging-bar convergence (XPBD iters/substeps)
 FEM_CONV_NPZ = os.path.join(DATA_DIR, "fem_convergence.npz")        # hanging-bar convergence (mesh + load steps)
 FEM_FRICTION_NPZ = os.path.join(DATA_DIR, "fem_friction.npz")       # sliding-block Coulomb friction (FEM)
-NEWTON_FRICTION_NPZ = os.path.join(DATA_DIR, "newton_friction.npz")  # sliding-block friction (Newton XPBD)
+NEWTON_FRICTION_NPZ = os.path.join(DATA_DIR, "newton_friction.npz")  # sliding-block friction (Newton, canonical XPBD)
+
+
+def solver_npz(base_npz: str, solver: str | None) -> str:
+    """Per-solver result path for a Newton scenario.
+
+    XPBD is the canonical run and keeps the base name; VBD and SemiImplicit get a
+    suffix so the three solvers can coexist on disk and a compare overlay can pick
+    up whichever are present (exactly as the hanging bar does with NEWTON_NPZ /
+    NEWTON_VBD_NPZ / NEWTON_SEMI_NPZ). Example::
+
+        solver_npz(NEWTON_INDENT_NPZ, "vbd")  -> ".../newton_indentation_vbd.npz"
+        solver_npz(NEWTON_INDENT_NPZ, "xpbd") -> ".../newton_indentation.npz"
+    """
+    if solver in (None, "xpbd"):
+        return base_npz
+    suffix = {"vbd": "_vbd", "semi_implicit": "_semi", "semi": "_semi", "explicit": "_semi"}
+    if solver not in suffix:
+        raise ValueError(f"unknown solver {solver!r}")
+    root, ext = os.path.splitext(base_npz)
+    return root + suffix[solver] + ext
 
 # --------------------------------------------------------------------------
 # Geometry  (block built from a regular grid of hexahedral cells -> tets)

@@ -111,25 +111,15 @@ def pick_tip_node(rest_q: np.ndarray) -> int:
 
 
 def _make_solver(solver_name, model, iterations):
-    """Map a solver name to a Newton solver instance."""
-    import newton
+    """Map a solver name to a Newton solver instance (shared factory).
 
-    if solver_name == "xpbd":
-        return newton.solvers.SolverXPBD(model=model, iterations=iterations)
-    if solver_name == "vbd":
-        # Vertex Block Descent: an IMPLICIT solver -- it minimises the backward-
-        # Euler objective by block coordinate descent over the coloured vertex
-        # graph (built in build_model), converging to the implicit solution as
-        # iterations grow. Self-contact off: the hanging bar has none.
-        return newton.solvers.SolverVBD(
-            model=model, iterations=iterations,
-            particle_enable_self_contact=False,
-            particle_enable_tile_solve=False,
-        )
-    if solver_name in ("semi_implicit", "explicit", "semi"):
-        # explicit, force-based integrator (the one Warp can differentiate)
-        return newton.solvers.SolverSemiImplicit(model)
-    raise ValueError(f"unknown solver {solver_name!r}")
+    Uses the same factory the contact scenarios use, so the three-solver story is
+    identical everywhere. The hanging bar has no collider, so no rigid-particle
+    buffer is needed here.
+    """
+    from newton_run._solver import make_solver
+
+    return make_solver(solver_name, model, iterations)
 
 
 def simulate(solver_name="xpbd", iterations=params.XPBD_ITERATIONS,

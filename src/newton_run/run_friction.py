@@ -1,31 +1,34 @@
-"""Friction -- Newton (XPBD) side: a soft block sliding on the ground.
+"""Friction -- Newton side: a soft block sliding on the ground.
 
 Same scenario as fenics_run/run_friction.py: a flat soft block rests on a rigid
 ground plane under gravity, and its TOP face is dragged tangentially (+x) in small
 kinematic increments. Coulomb friction at the floor is set via `soft_contact_mu`.
 
-The headline, on-message point: XPBD enforces friction as a positional projection
-and exposes NO calibrated tangential force -- exactly as it exposes no calibrated
-normal contact force. So the comparison axis here is the kinematic response:
+The headline, on-message point: the fast positional XPBD enforces friction as a
+positional projection and exposes NO calibrated tangential force -- exactly as it
+exposes no calibrated normal contact force. So the comparison axis here is the
+kinematic response:
 
   * mean bottom slip vs. top drag  -> the stick-then-slip knee, and
   * strain energy / residual KE.
 
 The FEM run provides the actual friction force and dissipated work; this run shows
-what XPBD can and cannot give.
+what each Newton solver can and cannot give.
 
-Solver note (fairness): XPBD only, like the other contact scenarios. The implicit VBD
-(the apples-to-apples match for the implicit FEM) is not shown because the rigid
-ground-plane + soft_contact Coulomb path used here is, in this repo, an XPBD path; VBD's
-contact is particle self-contact (off in the flagship) and SemiImplicit is the
-explicit/differentiable solver -- rigid-contact support for either is unverified
-(TODO[verify-on-colab]). So "Newton" here means XPBD.
+Solver note: like the flagship hanging bar, this runs all three Newton solvers via
+``--solver xpbd|vbd|semi_implicit`` (default XPBD). The collider is just the static
+ground plane, so the only contact is particle-vs-ground through the shared soft_contact
+buffer (VBD/SemiImplicit read soft_contact_mu for Coulomb exactly as XPBD does); no rigid
+body needs integrating. The implicit VBD is the apples-to-apples counterpart to the
+implicit FEM.
 
--> data/newton_friction.npz
+-> data/newton_friction{,_vbd,_semi}.npz (per --solver)
 
-Run on Colab (CUDA):  python -m newton_run.run_friction
+Run on Colab (CUDA):  python -m newton_run.run_friction [--solver vbd|semi_implicit]
 
-NOTE: ground-plane and particle-pinning calls are marked TODO[verify-on-colab].
+NOTE: ground-plane and particle-pinning calls are marked TODO[verify-on-colab]; the
+VBD/SemiImplicit ground-contact path needs a recent Newton (TODO[verify-on-colab]) -- on
+an older pinned version those runs may error and only XPBD records a result.
 """
 
 from __future__ import annotations
@@ -41,9 +44,13 @@ from compare import energies as en
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Newton XPBD sliding-block friction")
+    from newton_run._solver import SOLVERS, make_solver, needs_coloring
+
+    parser = argparse.ArgumentParser(description="Newton sliding-block friction")
     parser.add_argument("--device", default=None)
     parser.add_argument("--frames-per-step", type=int, default=30)
+    parser.add_argument("--solver", choices=SOLVERS, default="xpbd",
+                        help="xpbd (default) | vbd (implicit) | semi_implicit (explicit)")
     args = parser.parse_args()
 
     import newton
@@ -51,7 +58,7 @@ def main():
 
     wp.init()
     device = args.device or str(wp.get_device())
-    print(f"[friction-newton] device = {device}")
+    print(f"[friction-newton] device = {device}, solver = {args.solver}")
 
     nx, ny, nz = params.FRICTION_DIM
     h = params.FRICTION_CELL
@@ -68,6 +75,8 @@ def main():
             density=params.DENSITY, k_mu=params.K_MU, k_lambda=params.K_LAMBDA, k_damp=params.K_DAMP,
         )
         builder.add_ground_plane()                    # TODO[verify-on-colab]
+        if needs_coloring(args.solver):
+            builder.color()                           # vertex graph colouring for VBD
         model = builder.finalize()
 
         rest = model.particle_q.numpy()
@@ -89,7 +98,7 @@ def main():
         model.soft_contact_kf = 1.0e3
         model.soft_contact_mu = mu
 
-        solver = newton.solvers.SolverXPBD(model=model, iterations=10)
+        solver = make_solver(args.solver, model, iterations=10)
         state_0 = model.state()
         state_1 = model.state()
         control = model.control()
@@ -134,15 +143,16 @@ def main():
         wall_time = time.perf_counter() - t0
 
         os.makedirs(params.DATA_DIR, exist_ok=True)
+        out = params.solver_npz(params.NEWTON_FRICTION_NPZ, args.solver)
         np.savez(
-            params.NEWTON_FRICTION_NPZ,
+            out,
             drag=np.array(drag_rec), bottom_slip=np.array(slip_rec),
             e_strain=np.array(e_strain), ke=np.array(ke),
-            mu=mu, weight=weight, wall_time=wall_time,
+            mu=mu, weight=weight, wall_time=wall_time, solver=args.solver,
         )
-        print(f"[friction-newton] wrote {params.NEWTON_FRICTION_NPZ}")
-        print("[friction-newton] note: XPBD exposes no calibrated friction force; "
-              "see the FEM run for force + dissipated work.")
+        print(f"[friction-newton] wrote {out}")
+        print(f"[friction-newton] note: Newton ({args.solver}) exposes no calibrated friction "
+              "force; see the FEM run for force + dissipated work.")
 
 
 if __name__ == "__main__":

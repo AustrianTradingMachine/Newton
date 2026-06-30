@@ -1,4 +1,4 @@
-"""Dynamic drop -- Newton (XPBD), the literal rigid_soft_contact scenario.
+"""Dynamic drop -- Newton, the literal rigid_soft_contact scenario.
 
 Adapted from Newton's examples/multiphysics/example_rigid_soft_contact.py to match
 the FEM drop benchmark (same block geometry/material and sphere as params.DROP_*):
@@ -6,20 +6,21 @@ a soft block rests on the ground and a *free* rigid sphere is dropped onto it
 under gravity. This is the original dynamic-impact case (vs. the indentation
 test's controlled quasi-static indentation).
 
-Solver note (fairness): runs XPBD only. The FEM side is *implicit* Newmark, whose
-apples-to-apples Newton counterpart would be the implicit VBD -- but this scene couples a
-*free* rigid sphere + ground plane to the block through Newton's rigid-body soft_contact
-pipeline, which here only XPBD drives (VBD is deformable-only in this repo; SemiImplicit is
-explicit/differentiable; rigid-contact support for either is unverified --
-TODO[verify-on-colab]). So "Newton" here is XPBD, and the XPBD-vs-Newmark transient is not
-a clean solver-only comparison -- it also mixes material, contact model and time stepping
-(see compare/drop).
+Solver note: runs all three Newton solvers via ``--solver xpbd|vbd|semi_implicit``
+(default XPBD). This is the HARDEST contact case: the sphere is a *free* rigid body, so
+the implicit VBD must integrate it two-way itself (AVBD) -- enabled via the
+``rigid_body_particle_contact_buffer_size`` knob in the shared solver factory -- the
+newest, most version-sensitive Newton path (TODO[verify-on-colab]). The implicit VBD is
+the natural counterpart to the implicit Newmark FEM, but note that even a successful VBD
+run is only a *partial* fairness fix: the transient also mixes material (Newton
+StVK/co-rotational vs FEM Neo-Hookean), contact model and time integration (see
+compare/drop), so it is never a clean solver-only comparison.
 
-Records a time series -> data/newton_drop.npz:
+Records a time series -> data/newton_drop{,_vbd,_semi}.npz (per --solver):
   t, sphere_z, penetration, strain_energy (block), kinetic_energy (block)
   plus rest_q, final_q, tet_indices, sphere_c at the deepest-impact frame (3D scene).
 
-Run on Colab (CUDA):  python -m newton_run.run_drop
+Run on Colab (CUDA):  python -m newton_run.run_drop [--solver vbd|semi_implicit]
 """
 
 from __future__ import annotations
@@ -34,8 +35,13 @@ from compare import energies as en
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Newton XPBD dynamic drop")
+    from newton_run._solver import SOLVERS, make_solver, needs_coloring
+
+    parser = argparse.ArgumentParser(description="Newton dynamic drop")
     parser.add_argument("--device", default=None)
+    parser.add_argument("--solver", choices=SOLVERS, default="xpbd",
+                        help="xpbd (default) | vbd (implicit, two-way AVBD for the free "
+                             "sphere) | semi_implicit (explicit)")
     args = parser.parse_args()
 
     import newton
@@ -43,7 +49,7 @@ def main():
 
     wp.init()
     device = args.device or str(wp.get_device())
-    print(f"[drop-newton] device = {device}")
+    print(f"[drop-newton] device = {device}, solver = {args.solver}")
 
     nx, ny, nz = params.DROP_DIM
     h = params.DROP_CELL
@@ -74,13 +80,18 @@ def main():
             label="sphere")
         builder.add_shape_sphere(sphere_body, radius=R, cfg=sphere_cfg, label="rigid_sphere")
 
+        if needs_coloring(args.solver):
+            builder.color()                           # vertex graph colouring for VBD
         model = builder.finalize()
         model.soft_contact_ke = 1.0e5
         model.soft_contact_kd = 1.0e-4
         model.soft_contact_kf = 1.0e3
         model.soft_contact_mu = 0.3
 
-        solver = newton.solvers.SolverXPBD(model=model, iterations=10)
+        # the sphere is a FREE rigid body -> VBD integrates it two-way (AVBD), which needs
+        # a body<->particle contact buffer; XPBD/SemiImplicit ignore the argument.
+        rigid_buffer = 256 if args.solver == "vbd" else None
+        solver = make_solver(args.solver, model, iterations=10, rigid_particle_buffer=rigid_buffer)
         state_0 = model.state()
         state_1 = model.state()
         control = model.control()
@@ -117,11 +128,12 @@ def main():
                       f"U={U:.3g} KE={ke:.3g}")
 
         os.makedirs(params.DATA_DIR, exist_ok=True)
-        np.savez(params.NEWTON_DROP_NPZ, history=np.array(hist, dtype=np.float64),
-                 sphere_r=R, block=(Lx, Ly, Lz),
+        out = params.solver_npz(params.NEWTON_DROP_NPZ, args.solver)
+        np.savez(out, history=np.array(hist, dtype=np.float64),
+                 sphere_r=R, block=(Lx, Ly, Lz), solver=args.solver,
                  # deformed mesh + sphere at deepest impact (for the 3D scene render)
                  rest_q=rest, final_q=scene_q, tet_indices=tets, sphere_c=scene_c)
-        print(f"[drop-newton] wrote {params.NEWTON_DROP_NPZ}")
+        print(f"[drop-newton] wrote {out}")
 
 
 if __name__ == "__main__":

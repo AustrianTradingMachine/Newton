@@ -1,4 +1,4 @@
-"""Indentation -- Newton (XPBD) side: a rigid sphere pressed into a soft slab.
+"""Indentation -- Newton side: a rigid sphere pressed into a soft slab.
 
 Adapted from Newton's `examples/multiphysics/example_rigid_soft_contact.py`, but
 configured to match the FEniCSx indentation benchmark (same slab geometry/material as
@@ -7,31 +7,33 @@ whose centre is lowered in the same indentation steps as the FEM run, and the
 slab bottom is clamped.
 
 Why kinematic + clamped: it mirrors the FEM indentation benchmark so the deformed
-shapes are comparable. The headline difference we want to show is that XPBD has
-*no calibrated contact stiffness* -- it enforces contact as a positional
-projection -- so the meaningful comparison axis is the DEFORMATION / PENETRATION,
-not a contact force (XPBD does not expose one cleanly; the FEM penalty run does).
+shapes are comparable. The headline difference we want to show is that the fast
+positional XPBD has *no calibrated contact stiffness* -- it enforces contact as a
+positional projection -- so the meaningful comparison axis is the DEFORMATION /
+PENETRATION, not a contact force (XPBD does not expose one cleanly; the FEM penalty
+run does).
 
-Solver note (fairness): the flagship hanging bar runs all three Newton solvers
-(XPBD / VBD / SemiImplicit), but this contact scenario runs XPBD only. The rigid sphere
-couples to the soft grid through Newton's rigid-body + soft_contact pipeline (kinematic
-body + model.soft_contact_*), which in this repo is exercised only via XPBD. VBD here is
-wired for deformable elasticity (its contact is particle self-contact, off) and
-SemiImplicit is the explicit/differentiable solver; whether either can drive this
-rigid-contact path is unverified -- TODO[verify-on-colab]. So in the contact scenarios
-"Newton" means XPBD specifically.
+Solver note: like the flagship hanging bar, this runs all three Newton solvers via
+``--solver xpbd|vbd|semi_implicit`` (default XPBD, the canonical run). All three drive the
+SAME contact -- the kinematic sphere couples to the soft grid through the shared
+soft_contact buffer (model.collide + model.soft_contact_*), the wiring Newton's own
+example_rigid_soft_contact.py uses for every solver. The implicit VBD is the apples-to-
+apples counterpart to the implicit FEM penalty solve; the kinematic collider makes this
+the easiest contact case for a solver swap (no free rigid body to integrate).
 
-Outputs -> data/newton_indentation.npz:
+Outputs -> data/newton_indentation{,_vbd,_semi}.npz (per --solver):
   * deltas                 indentation schedule [m]
   * line_x, uz_line        deformed top-surface dimple at max indentation
   * penetration            max sphere/soft-body overlap per indentation step [m]
   * rest_q, final_q, tet_indices, sphere_c, sphere_r   deformed mesh + sphere at
                            max indentation (for the 3D scene render)
 
-Run on Colab (CUDA):  python -m newton_run.run_indentation
+Run on Colab (CUDA):  python -m newton_run.run_indentation [--solver vbd|semi_implicit]
 
 NOTE: kinematic-body and particle-pinning calls are marked TODO[verify-on-colab];
-they follow the proven patterns in Newton's cable / rigid_soft_contact examples.
+they follow the proven patterns in Newton's cable / rigid_soft_contact examples. The
+VBD/SemiImplicit contact path needs a recent Newton (TODO[verify-on-colab]); on an older
+pinned version those runs may error and only XPBD records a result.
 """
 
 from __future__ import annotations
@@ -59,7 +61,7 @@ def _make_body_kinematic(builder, body):
     builder.body_inv_inertia[body] = wp.mat33(0.0)
 
 
-def build_model(builder_cls):
+def build_model(builder_cls, color=False):
     import warp as wp
 
     nx, ny, nz = params.INDENT_DIM
@@ -95,6 +97,9 @@ def build_model(builder_cls):
     )
     builder.add_shape_sphere(sphere_body, radius=R, cfg=sphere_cfg, label="rigid_sphere")
     _make_body_kinematic(builder, sphere_body)  # TODO[verify-on-colab]
+
+    if color:
+        builder.color()        # vertex graph colouring required by the VBD solver
 
     return builder, sphere_body, (Lx, Ly, Lz, R, cx, cy)
 
@@ -139,9 +144,15 @@ def set_sphere_z(states, solver, sphere_body, cx, cy, cz):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Newton XPBD rigid-sphere indentation")
+    from newton_run._solver import SOLVERS, make_solver, needs_coloring
+
+    parser = argparse.ArgumentParser(description="Newton rigid-sphere indentation")
     parser.add_argument("--device", default=None)
     parser.add_argument("--frames-per-step", type=int, default=30)
+    parser.add_argument("--solver", choices=SOLVERS, default="xpbd",
+                        help="xpbd = positional projection (default, canonical run); "
+                             "vbd = implicit (apples-to-apples with the implicit FEM); "
+                             "semi_implicit = explicit force-based")
     args = parser.parse_args()
 
     import newton
@@ -149,10 +160,11 @@ def main():
 
     wp.init()
     device = args.device or str(wp.get_device())
-    print(f"[indent-newton] device = {device}")
+    print(f"[indent-newton] device = {device}, solver = {args.solver}")
 
     with wp.ScopedDevice(device):
-        builder, sphere_body, (Lx, Ly, Lz, R, cx, cy) = build_model(newton.ModelBuilder)
+        builder, sphere_body, (Lx, Ly, Lz, R, cx, cy) = build_model(
+            newton.ModelBuilder, color=needs_coloring(args.solver))
         model = builder.finalize()
         rest, bottom = pin_bottom(model)
         tets = model.tet_indices.numpy()
@@ -164,7 +176,7 @@ def main():
         model.soft_contact_kf = 1.0e3
         model.soft_contact_mu = 1.0
 
-        solver = newton.solvers.SolverXPBD(model=model, iterations=10)
+        solver = make_solver(args.solver, model, iterations=10)
         state_0 = model.state()
         state_1 = model.state()
         control = model.control()
@@ -214,8 +226,9 @@ def main():
         wall_time = time.perf_counter() - t0
 
         os.makedirs(params.DATA_DIR, exist_ok=True)
+        out = params.solver_npz(params.NEWTON_INDENT_NPZ, args.solver)
         np.savez(
-            params.NEWTON_INDENT_NPZ,
+            out,
             deltas=np.array(deltas),
             penetration=np.array(penetration),
             e_strain=np.array(e_strain),
@@ -227,9 +240,10 @@ def main():
             # deformed mesh + sphere at max indentation (for the 3D scene render)
             rest_q=rest, final_q=q, tet_indices=tets,
             sphere_c=np.array([cx, cy, cz], dtype=float), sphere_r=float(R),
+            solver=args.solver,
         )
-        print(f"[indent-newton] wrote {params.NEWTON_INDENT_NPZ}")
-        print(f"[indent-newton] solve wall time = {wall_time:.3f} s")
+        print(f"[indent-newton] wrote {out}")
+        print(f"[indent-newton] solve wall time = {wall_time:.3f} s (solver={args.solver})")
 
 
 if __name__ == "__main__":

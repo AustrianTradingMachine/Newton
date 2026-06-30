@@ -12,20 +12,29 @@ not.** XPBD enforces non-penetration by positional projection and exposes no
 comparable force, so the honest common axis is the deformation, and the force curve
 is something the fast solver simply cannot provide.
 
-> **A note on fairness.** These contact scenarios run Newton's **XPBD only**, whereas the
-> flagship hanging bar runs all three Newton solvers. The reason is structural: the rigid
-> sphere / ground plane couple to the soft body through Newton's rigid-body `soft_contact`
-> pipeline, which in this repo is exercised only via XPBD (adapted from Newton's
-> `rigid_soft_contact` example). VBD here is wired for deformable elasticity (its contact is
-> particle self-contact) and SemiImplicit is the explicit/differentiable solver; whether
-> either can drive this rigid-contact path is **unverified** (`TODO[verify-on-colab]`). So in
-> the contact scenarios *"Newton" means XPBD specifically* — and the "no calibrated contact
-> force" point is XPBD's limitation, not a general Newton one. Two consequences to read
-> honestly: (i) for the **drop**, the FEM is *implicit* Newmark, whose apples-to-apples Newton
-> match would be the *implicit VBD* — unavailable here, so XPBD-vs-Newmark is not a clean
-> solver-only contrast; (ii) part of any residual gap is **constitutive** (Newton's
-> StVK/co-rotational vs FEM's Neo-Hookean), which grows once strains leave the small-strain
-> regime, so the contact curves are not pure solver error.
+> **A note on fairness.** Each contact scenario can run **all three** Newton solvers via
+> `--solver xpbd|vbd|semi_implicit` (default XPBD, the canonical run) — so the **implicit
+> VBD** is the apples-to-apples partner for the implicit FEM, not just XPBD. All three drive
+> the *same* contact: each step calls `model.collide` once into the shared `soft_contact`
+> buffer (`model.soft_contact_ke/kd/kf/mu`), and `solver.step(..., contacts, dt)` reads it —
+> exactly the wiring Newton's own `example_rigid_soft_contact.py` uses when switched between
+> solvers (our contact runs are adapted from it). So running XPBD alone was a **wiring
+> choice**, not a Newton limitation.
+>
+> The honest caveat is now about **version**, not capability. The rich VBD soft/rigid-contact
+> path (VBD integrating rigid bodies itself via AVBD; the `rigid_body_particle_contact_buffer_size`
+> knob) landed on recent Newton `main`; the repo's pinned version may predate it, in which
+> case the VBD/SemiImplicit contact runs **error** and only XPBD records a result. This is
+> **unverified locally** (no GPU here) — `TODO[verify-on-colab]`: one CUDA run checks
+> `newton.__version__` and that `example_rigid_soft_contact.py --solver vbd` runs.
+>
+> Two consequences to read honestly regardless: (i) the **drop** is the hardest case — its
+> *free* sphere needs VBD's two-way AVBD (the most version-sensitive path), and the FEM side
+> is *implicit* Newmark, so even a successful VBD run is only a **partial** fairness fix; the
+> transient still mixes material, contact model and time integration. (ii) part of any residual
+> gap is **constitutive** (Newton's StVK/co-rotational vs FEM's Neo-Hookean), which grows once
+> strains leave the small-strain regime — not pure solver error. And "no calibrated contact
+> force" remains specifically an **XPBD** limitation, not a general Newton one.
 
 ---
 
@@ -91,15 +100,17 @@ F = (4/3) E* √R · δ^{3/2},     1/E* = (1 − ν²)/E.
 small depth and deviate as the contact radius grows relative to the slab. The run
 prints each variant's force/Hertz ratio so the deviation is explicit.
 
-### The Newton (XPBD) side (`newton_run/run_indentation.py`)
+### The Newton side (`newton_run/run_indentation.py`, all three solvers)
 
 The same slab and schedule, but the sphere is a **kinematic rigid body** lowered in
-the same steps and the slab bottom is pinned (inverse mass → 0). XPBD's contact
-stiffness knobs (`soft_contact_ke/kd/kf`) are set but are **largely ignored for the
-normal force** — that is exactly the point: XPBD has no calibrated contact force to
-report. So the comparison axis is the **deformed dimple** (top-surface displacement
-through the contact centre) and the **penetration**, not a force. The run also saves
-the deformed mesh + sphere at maximum indentation so
+the same steps and the slab bottom is pinned (inverse mass → 0). `--solver` selects
+XPBD / VBD / SemiImplicit on this identical scene; the kinematic collider (no free body
+to integrate) makes it the easiest contact case for the swap. XPBD's contact stiffness
+knobs (`soft_contact_ke/kd/kf`) are set but are **largely ignored for the normal force**
+— that is exactly the point: XPBD has no calibrated contact force to report. So the
+comparison axis is the **deformed dimple** (top-surface displacement through the contact
+centre) and the **penetration**, not a force. The run also saves the deformed mesh +
+sphere at maximum indentation so
 [`compare/scene.py`](../src/compare/scene.py) can render the real dimple in 3-D.
 
 `python -m compare.indentation` overlays the FEM force curves (+ Hertz), the dimples,
@@ -142,12 +153,14 @@ Pure UFL/dolfinx **elastodynamics**:
 It records a time series → `data/fem_drop.npz`: sphere height, penetration, block
 strain energy, block kinetic energy, contact force.
 
-### The Newton (XPBD) side (`newton_run/run_drop.py`)
+### The Newton side (`newton_run/run_drop.py`, all three solvers)
 
 The same block/sphere with `add_ground_plane` and a free rigid sphere
-(`add_shape_sphere`), stepped with `SolverXPBD`. It records the same time-series
-diagnostics and keeps the **deepest-impact frame** (deformed mesh + sphere centre) for
-the 3-D render. `compare/drop.py` overlays the two and writes `drop_scene.png`.
+(`add_shape_sphere`), stepped with the `--solver`-selected solver. It records the same
+time-series diagnostics and keeps the **deepest-impact frame** (deformed mesh + sphere
+centre) for the 3-D render. `compare/drop.py` overlays whichever solver runs are present
+and writes `drop_scene.png`. The **free** sphere makes the implicit VBD path the hardest /
+most version-sensitive here (two-way AVBD body integration; `TODO[verify-on-colab]`).
 
 **Honesty note.** The dynamic contact path is the least settled numerically: dt,
 penalty stiffness and damping all need tuning, and the FEM drop file flags its dynamic

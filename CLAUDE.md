@@ -34,9 +34,10 @@ Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capa
 src/common/params.py                single source of truth
 src/common/mesh_io.py               shared mesh Newton <-> FEM (tet orientation)
 src/newton_run/run_hanging_bar.py   three solvers (--solver xpbd|vbd|semi_implicit); writes the shared mesh
-src/newton_run/run_indentation.py   XPBD sphere indentation
-src/newton_run/run_drop.py          XPBD dynamic drop
-src/newton_run/run_friction.py      XPBD sliding block
+src/newton_run/run_indentation.py   sphere indentation (--solver xpbd|vbd|semi_implicit)
+src/newton_run/run_drop.py          dynamic drop (--solver xpbd|vbd|semi_implicit)
+src/newton_run/run_friction.py      sliding block (--solver xpbd|vbd|semi_implicit)
+src/newton_run/_solver.py           shared Newton solver factory (make_solver/needs_coloring)
 src/newton_run/run_stress_strain.py SemiImplicit uniaxial material test
 src/newton_run/convergence.py       XPBD convergence (iterations / substeps sweep)
 src/newton_run/diffsim.py           differentiable theta* stiffness fit (SemiImplicit)
@@ -69,7 +70,7 @@ Data flow: `newton_run/run_hanging_bar` produces the **shared mesh** (`data/mesh
 - The diagnostics' correctness claims are **backed by `tests/test_energies.py`** (`pytest tests/` or `python tests/test_energies.py`): nodal forces = −dU/dx via a finite-difference check, and the uniaxial closed form to machine precision. Do not write "validated" for anything not covered there.
 - The θ* differentiable fit runs on **SemiImplicit** and characterises *that* solver vs FEM — **not XPBD**. XPBD's softness is measured by the equilibrium residual / tip ratio.
 - Colab result numbers are **observations** (Python 3.12, dolfinx 0.11.0), recorded with provenance — not eternal "verified" claims. `TODO[verify-on-colab]` marks what still needs a GPU run.
-- The **contact scenarios (indentation/drop/friction) use Newton's XPBD only** — VBD/SemiImplicit are not wired for Newton's rigid-body `soft_contact` path here (unverified → `TODO[verify-on-colab]`). Attribute "no calibrated contact force" to **XPBD**, not Newton generally; the drop's implicit-Newmark FEM has no implicit-Newton (VBD) counterpart shown, so don't present its transient as a clean solver-only gap.
+- The **contact scenarios (indentation/drop/friction) now wire all three solvers** via `--solver xpbd|vbd|semi_implicit` on the shared `soft_contact` path (as Newton's `example_rigid_soft_contact.py` does for every solver) — XPBD is the canonical default. So the implicit **VBD** is the apples-to-apples partner for the implicit FEM; running XPBD alone was a wiring choice, not a Newton limit. **But** whether the *pinned* Newton supports the VBD soft/rigid-contact path (AVBD, `rigid_body_particle_contact_buffer_size`) is unverified (`TODO[verify-on-colab]`): on an older pin the VBD/SemiImplicit contact runs error and only XPBD records a result — don't claim VBD-contact works without a Colab run. Attribute "no calibrated contact force" to **XPBD**, not Newton generally. The **drop** is the hardest case (free sphere → two-way AVBD) and only a *partial* fairness fix vs. implicit Newmark — its transient also mixes material/contact-model/time-integration, so don't present it as a clean solver-only gap.
 
 ## Running
 
