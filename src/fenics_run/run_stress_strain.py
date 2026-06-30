@@ -56,8 +56,12 @@ def main():
     bc_expr = fem.Expression(ufl.as_vector((0.0 * X[0], 0.0 * X[1], (lam_c - 1.0) * X[2])),
                              V.element.interpolation_points)
 
-    mu = default_scalar_type(params.K_MU)
-    lam = default_scalar_type(params.K_LAMBDA)
+    # fem.Constant, not bare numpy scalars: numpy hijacks np.float64 * (UFL tensor) into
+    # an object array, which breaks the ufl.inner(grad(w), P) form below. (Same fix as the
+    # drop run; the hanging-bar / indentation FEM runs wrap these the same way.) Note lam
+    # here is Lame lambda -- distinct from lam_c, the stretch control above.
+    mu = fem.Constant(msh, default_scalar_type(params.K_MU))
+    lam = fem.Constant(msh, default_scalar_type(params.K_LAMBDA))
     d = msh.geometry.dim
     F = ufl.Identity(d) + ufl.grad(u)
     J = ufl.det(F)

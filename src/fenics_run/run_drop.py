@@ -76,15 +76,25 @@ def main():
 
     # Newmark-beta (average acceleration: unconditionally stable, no numerical damping)
     beta, gamma = 0.25, 0.5
-    dt = default_scalar_type(params.DROP_DT)
+    # dt as a fem.Constant, NOT a bare numpy scalar: np.float64 * (UFL vector) lets numpy
+    # hijack the product and iterate the UFL operand into a Python object array, so
+    # v_new = v_old + dt*(...) silently becomes a list and ufl.dot(n_s, v_new - v_sphere)
+    # below fails. See the mu/lam/rho note further down; the hanging-bar / indentation FEM
+    # runs wrap their scalars the same way.
+    dt = fem.Constant(msh, default_scalar_type(params.DROP_DT))
     a_new = (u - u_old - dt * v_old) / (beta * dt * dt) - (1.0 - 2.0 * beta) / (2.0 * beta) * a_old
     v_new = v_old + dt * ((1.0 - gamma) * a_old + gamma * a_new)
 
-    rho = default_scalar_type(params.DENSITY)
-    mu = default_scalar_type(params.K_MU)
-    lam = default_scalar_type(params.K_LAMBDA)
+    # Material constants as fem.Constant for the same reason as dt above: a bare numpy
+    # scalar times a UFL tensor (mu * (F - Finv_T)) gets hijacked by numpy into an object
+    # array, which then breaks the residual's ufl.inner(grad(w), P). rho_val stays a plain
+    # number for the body-force array literal.
+    rho_val = params.DENSITY
     g = params.GRAVITY
-    body_force = fem.Constant(msh, np.array([0.0, 0.0, -rho * g], dtype=default_scalar_type))
+    rho = fem.Constant(msh, default_scalar_type(rho_val))
+    mu = fem.Constant(msh, default_scalar_type(params.K_MU))
+    lam = fem.Constant(msh, default_scalar_type(params.K_LAMBDA))
+    body_force = fem.Constant(msh, np.array([0.0, 0.0, -rho_val * g], dtype=default_scalar_type))
 
     # Neo-Hookean 1st Piola-Kirchhoff
     d = msh.geometry.dim

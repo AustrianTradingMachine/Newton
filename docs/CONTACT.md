@@ -114,7 +114,7 @@ sphere at maximum indentation so
 [`compare/scene.py`](../src/compare/scene.py) can render the real dimple in 3-D.
 
 `python -m compare.indentation` overlays the FEM force curves (+ Hertz), the dimples,
-and the penetration gradation; [`20_indentation.ipynb`](../20_indentation.ipynb)
+and the penetration gradation; [`20_contact.ipynb`](../20_contact.ipynb)
 tells the story verdict-first.
 
 ---
@@ -159,7 +159,8 @@ The same block/sphere with `add_ground_plane` and a free rigid sphere
 (`add_shape_sphere`), stepped with the `--solver`-selected solver. It records the same
 time-series diagnostics and keeps the **deepest-impact frame** (deformed mesh + sphere
 centre) for the 3-D render. `compare/drop.py` overlays whichever solver runs are present
-and writes `drop_scene.png`. The **free** sphere makes the implicit VBD path the hardest /
+and writes `drop_scene.png`; [`25_dynamic.ipynb`](../25_dynamic.ipynb) tells the story
+verdict-first. The **free** sphere makes the implicit VBD path the hardest /
 most version-sensitive here (two-way AVBD body integration; `TODO[verify-on-colab]`).
 
 **Honesty note.** The dynamic contact path is the least settled numerically: dt,

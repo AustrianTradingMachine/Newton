@@ -29,6 +29,12 @@ the friction force plateaus at mu*W -- both N~W and the plateau test the FEM.
 -> data/fem_friction.npz
 
 Run (needs dolfinx):  python -m fenics_run.run_friction
+
+TODO[verify-on-colab]: the static free-body settle was singular at u=0 -- the block has a
+free vertical rigid mode and the one-sided floor penalty is inactive at zero penetration --
+which produced an all-zero F/N/slip run (data/fem_friction.npz). settle_gravity now bootstraps
+an initial floor penetration; re-run on Colab to regenerate the npz and confirm N ~ W and the
+friction force reaching the mu*W plateau.
 """
 
 from __future__ import annotations
@@ -118,6 +124,15 @@ def main():
     slipfrac_form = fem.form(slipping * ds(BOT))
 
     def settle_gravity():
+        # The block is free in z (only the top face's x, y are fixed) and is held up solely by
+        # the one-sided floor penalty, which is INACTIVE at u=0 (pen=0 -> zero contact tangent).
+        # That leaves the vertical rigid-body mode unconstrained, so the Jacobian at u=0 is
+        # singular and the solve never settles -- the source of an all-zero F/N/slip run.
+        # Bootstrap it by starting the block penetrating the floor a few x its equilibrium
+        # depth, so contact is active (pen>0, tangent kn) from the first Newton iteration.
+        pen0 = params.friction_block_weight() / (float(kn.value) * area)
+        u.x.array[2::3] = -2.0 * pen0          # uniform downward offset -> bottom face in contact
+        u.x.scatter_forward()
         for s in (0.25, 0.5, 0.75, 1.0):
             load_scale.value = s
             solve_status(problem, u)

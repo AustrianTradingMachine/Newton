@@ -204,15 +204,18 @@ def main():
 
 def _plots(results, f_hertz):
     import matplotlib
-    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    from compare import style  # shared colour code: a given FEM variant is the same colour everywhere
+
+    matplotlib.use("Agg")
     os.makedirs(params.FIG_DIR, exist_ok=True)
 
     plt.figure(figsize=(6, 5))
-    for r in results:
-        plt.plot(r["deltas"] * 1000, r["f_fem"], "o-", label="FEM " + r["label"])
-    plt.plot(results[0]["deltas"] * 1000, f_hertz, "k--", lw=1.5, label="Hertz")
+    for i, r in enumerate(results):
+        plt.plot(r["deltas"] * 1000, r["f_fem"], "o-", color=style.fem_variant_color(i), label="FEM " + r["label"])
+    plt.plot(results[0]["deltas"] * 1000, f_hertz, color=style.COLOR["analytic"], ls=style.ANALYTIC_LS,
+             lw=1.5, label="Hertz")
     plt.xlabel("indentation depth  [mm]"); plt.ylabel("contact force  [N]")
     plt.title("Indentation: contact force (element + penalty + AL)")
     plt.legend(); plt.grid(alpha=0.3)
@@ -220,8 +223,9 @@ def _plots(results, f_hertz):
     plt.tight_layout(); plt.savefig(out, dpi=130); print(f"[indent-fem] wrote {out}")
 
     plt.figure(figsize=(6, 4))
-    for r in results:
-        plt.plot(r["deltas"] * 1000, r["penetration"] * 1000, "o-", label="FEM " + r["label"])
+    for i, r in enumerate(results):
+        plt.plot(r["deltas"] * 1000, r["penetration"] * 1000, "o-", color=style.fem_variant_color(i),
+                 label="FEM " + r["label"])
     plt.xlabel("indentation depth  [mm]"); plt.ylabel("max penetration  [mm]")
     plt.title("Indentation: residual penetration (AL ~ 0 at modest kn)")
     plt.legend(); plt.grid(alpha=0.3)
@@ -229,8 +233,9 @@ def _plots(results, f_hertz):
     plt.tight_layout(); plt.savefig(out, dpi=130); print(f"[indent-fem] wrote {out}")
 
     plt.figure(figsize=(6, 4))
-    for r in results:
-        plt.plot((r["line_x"] - r["cx"]) * 1000, r["uz_line"] * 1000, label="FEM " + r["label"])
+    for i, r in enumerate(results):
+        plt.plot((r["line_x"] - r["cx"]) * 1000, r["uz_line"] * 1000, color=style.fem_variant_color(i),
+                 label="FEM " + r["label"])
     plt.xlabel("x - x_centre  [mm]"); plt.ylabel("vertical displacement u_z  [mm]")
     plt.title("Indentation: deformed top-surface profile (max indentation)")
     plt.legend(); plt.grid(alpha=0.3)

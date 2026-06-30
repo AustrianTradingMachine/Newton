@@ -54,7 +54,8 @@ src/compare/scene.py                3-D scene render of the deformed body (matpl
 tests/test_energies.py          validates the diagnostics (no GPU/FEM needed)
 00_setup.ipynb            install + run the whole pipeline (any CUDA GPU); each stage -> logs/summary.txt (OK/ERR health report)
 10_hanging_bar.ipynb            hanging-bar analysis: XPBD / VBD / explicit vs FEM tet/hex vs analytic
-20_indentation.ipynb            contact: force vs Hertz, dimple, penalty-vs-AL penetration
+20_contact.ipynb            contact: force vs Hertz, dimple, penalty-vs-AL penetration
+25_dynamic.ipynb            dynamic drop: sphere trajectory, penetration, block energies (Newton vs Newmark FEM)
 30_convergence.ipynb            discretisation error vs solver error
 40_friction.ipynb               Coulomb friction force / work / slip
 ```

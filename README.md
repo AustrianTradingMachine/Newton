@@ -76,7 +76,7 @@ src/newton_run/   run_hanging_bar · run_indentation · run_drop · run_friction
 src/fenics_run/   run_hanging_bar · run_indentation · run_drop · run_friction · run_stress_strain · convergence
 src/compare/      hanging_bar · indentation · drop · friction · stress_strain · convergence · energies · scene
 tests/        test_energies.py   (finite-difference force check + machine-precision stress check)
-10_hanging_bar · 20_indentation · 30_convergence · 40_friction   (analysis notebooks)
+10_hanging_bar · 20_contact · 25_dynamic · 30_convergence · 40_friction   (analysis notebooks)
 00_setup.ipynb     install + run the whole pipeline (any CUDA GPU; Colab = easy path)
 ```
 

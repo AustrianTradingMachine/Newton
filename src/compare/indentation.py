@@ -16,6 +16,10 @@ Caveat: whether the VBD/SemiImplicit contact runs exist depends on a recent Newt
 residual Newton-vs-FEM dimple gap is constitutive (Newton StVK vs FEM Neo-Hookean),
 growing outside small strain -- it is not a pure solver gap.
 
+The make_* helpers build and return a Figure (no save/show), so the notebook (20_contact)
+imports the SAME functions and renders inline; main() sets Agg and saves the PNGs. Colours
+come from compare.style so every solver/variant matches across all contact plots.
+
 Run from the repository root (after the indentation FEM and/or Newton have produced npz):
 
     python -m compare.indentation
@@ -26,84 +30,84 @@ from __future__ import annotations
 import os
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 
 from common import params
+from compare import style
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
-# Newton solver runs to overlay if their npz is present:  label -> (solver key, colour, marker)
-NEWTON_RUNS = (
-    ("Newton XPBD", "xpbd", "tab:orange", "o"),
-    ("Newton VBD", "vbd", "tab:red", "s"),
-    ("Newton explicit", "semi_implicit", "tab:purple", "^"),
-)
+# Backend is NOT forced at import (20_contact imports the make_* helpers and renders inline);
+# main() sets Agg before saving.
 
 
 def _fem_variants(fem):
-    """Return [(slug, uz_array)] for every FEM variant stored in the npz."""
+    """Return [(slug, uz_array)] for every FEM variant stored in the npz (canonical order)."""
     return [(k[3:], fem[k]) for k in fem.files if k.startswith("uz_")]
 
 
-def _load_newtons():
-    """Whichever Newton indentation solver runs exist on disk: [(label, data, colour, marker)]."""
-    out = []
-    for label, solver, color, marker in NEWTON_RUNS:
-        path = params.solver_npz(params.NEWTON_INDENT_NPZ, solver)
-        if os.path.exists(path):
-            out.append((label, np.load(path, allow_pickle=False), color, marker))
-    return out
+def make_dimple(fem, newtons):
+    """Deformed top-surface dimple: every FEM variant + every present Newton solver -> Figure."""
+    fig = plt.figure(figsize=(6, 5))
+    fem_x = fem["line_x"] - float(fem["cx"])
+    for i, (slug, uz) in enumerate(_fem_variants(fem)):
+        plt.plot(fem_x * 1000, uz * 1000, color=style.fem_variant_color(i), label=f"FEM {slug}")
+    for label, d, color, *rest in newtons:
+        marker = rest[0] if rest else "o"
+        nx = d["line_x"] - float(d["cx"])
+        plt.plot(nx * 1000, d["uz_line"] * 1000, color=color, marker=marker, ms=3, lw=1.6, label=label)
+    plt.xlabel("x - x_centre  [mm]")
+    plt.ylabel("vertical displacement u_z  [mm]")
+    plt.title("Indentation: deformed dimple -- FEM vs Newton solvers")
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    return fig
+
+
+def make_newton_penetration(newtons):
+    """Each present Newton solver's penetration vs indentation depth -> Figure (None if none)."""
+    if not newtons:
+        return None
+    fig = plt.figure(figsize=(6, 4))
+    for label, d, color, *rest in newtons:
+        marker = rest[0] if rest else "o"
+        plt.plot(d["deltas"] * 1000, d["penetration"] * 1000, color=color, marker=marker, ms=3, label=label)
+    plt.xlabel("indentation depth  [mm]")
+    plt.ylabel("max sphere/body penetration  [mm]")
+    plt.title("Indentation: Newton penetration vs. indentation")
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    return fig
 
 
 def main():
+    matplotlib.use("Agg")   # headless for the pipeline; 20_contact imports the make_* helpers
     os.makedirs(params.FIG_DIR, exist_ok=True)
 
     if not os.path.exists(params.FEM_INDENT_NPZ):
         raise FileNotFoundError(
             f"{params.FEM_INDENT_NPZ} missing -- run `python -m fenics_run.run_indentation` first")
     fem = np.load(params.FEM_INDENT_NPZ, allow_pickle=False)
-    newtons = _load_newtons()
+    newtons = style.load_newton_runs(params.NEWTON_INDENT_NPZ)
 
-    # ---- dimple overlay --------------------------------------------------
-    plt.figure(figsize=(6, 5))
-    fem_x = fem["line_x"] - float(fem["cx"])
-    for slug, uz in _fem_variants(fem):
-        plt.plot(fem_x * 1000, uz * 1000, label=f"FEM {slug}")
-    for label, d, color, marker in newtons:
-        nx = d["line_x"] - float(d["cx"])
-        plt.plot(nx * 1000, d["uz_line"] * 1000, color=color, marker=marker, ms=3, lw=1.6,
-                 label=label)
-    plt.xlabel("x - x_centre  [mm]")
-    plt.ylabel("vertical displacement u_z  [mm]")
-    plt.title("Indentation: deformed dimple -- FEM vs Newton solvers")
-    plt.legend()
-    plt.grid(alpha=0.3)
-    out = os.path.join(params.FIG_DIR, "indentation_compare_profile.png")
-    plt.tight_layout()
-    plt.savefig(out, dpi=130)
-    print(f"[compare-indent] wrote {out}")
-
-    # ---- Newton penetration vs indentation -------------------------------
-    if newtons:
-        plt.figure(figsize=(6, 4))
-        for label, d, color, marker in newtons:
-            plt.plot(d["deltas"] * 1000, d["penetration"] * 1000, color=color, marker=marker,
-                     ms=3, label=label)
-        plt.xlabel("indentation depth  [mm]")
-        plt.ylabel("max sphere/body penetration  [mm]")
-        plt.title("Indentation: Newton penetration vs. indentation")
-        plt.legend()
-        plt.grid(alpha=0.3)
-        out = os.path.join(params.FIG_DIR, "indentation_newton_penetration.png")
-        plt.tight_layout()
-        plt.savefig(out, dpi=130)
+    for fig, name in (
+        (make_dimple(fem, newtons), "indentation_compare_profile.png"),
+        (make_newton_penetration(newtons), "indentation_newton_penetration.png"),
+    ):
+        if fig is None:
+            continue
+        out = os.path.join(params.FIG_DIR, name)
+        fig.savefig(out, dpi=130)
+        plt.close(fig)
         print(f"[compare-indent] wrote {out}")
-        for label, d, _, _ in newtons:
+
+    if newtons:
+        for label, d, *_ in newtons:
             print(f"[compare-indent] {label} max penetration at full indentation = "
                   f"{d['penetration'][-1] * 1000:.2f} mm")
     else:
-        print("[compare-indent] no Newton result (data/newton_indentation*.npz) -- FEM-only plot")
+        print("[compare-indent] no Newton result (data/newton_indentation*.npz) -- FEM-only dimple")
 
 
 if __name__ == "__main__":

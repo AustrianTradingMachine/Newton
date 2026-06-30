@@ -20,18 +20,21 @@ from __future__ import annotations
 import os
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 
 from common import params
+from compare import style
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+# The backend is NOT forced at import, so notebooks can import the make_* plot helpers below
+# and render them inline; the CLI/pipeline sets Agg in main() before saving. compare/scene.py
+# follows the same import-safe pattern.
 
 # Newton solver runs to include if their npz is present:  label -> (path, colour)
 NEWTON_RUNS = (
-    ("Newton XPBD", params.NEWTON_NPZ, "tab:orange"),
-    ("Newton VBD", params.NEWTON_VBD_NPZ, "tab:red"),
-    ("Newton explicit", params.NEWTON_SEMI_NPZ, "tab:purple"),
+    (style.LABEL["xpbd"], params.NEWTON_NPZ, style.COLOR["xpbd"]),
+    (style.LABEL["vbd"], params.NEWTON_VBD_NPZ, style.COLOR["vbd"]),
+    (style.LABEL["semi_implicit"], params.NEWTON_SEMI_NPZ, style.COLOR["semi_implicit"]),
 )
 
 
@@ -102,61 +105,76 @@ def report(newtons, fem, hexfem):
         fh.write(text + "\n")
 
 
-def plot_profile(newtons, fem, hexfem):
-    """Downward displacement vs original height z, all solvers/meshes overlaid."""
+def make_profile(newtons, fem, hexfem):
+    """Downward displacement vs original height z, all solvers/meshes overlaid -> Figure."""
     rest = fem["rest_q"]
     z_top = rest[fem["fixed_nodes"], 2].mean()
     za = np.linspace(rest[:, 2].min(), rest[:, 2].max(), 100)
     ua = params.analytic_hanging_displacement(za, z_top, params.BLOCK_LZ) * 1000.0
 
-    plt.figure(figsize=(6, 5))
+    fig = plt.figure(figsize=(6, 5))
     for label, d, color in newtons:
         plt.scatter(d["rest_q"][:, 2], -displacement(d)[:, 2] * 1000.0,
                     s=8, alpha=0.4, label=label, color=color)
     plt.scatter(fem["rest_q"][:, 2], -displacement(fem)[:, 2] * 1000.0,
-                s=8, alpha=0.4, label="FEM tet", color="tab:blue")
+                s=8, alpha=0.4, label="FEM tet", color=style.COLOR["fem"])
     if hexfem is not None:
         plt.scatter(hexfem["rest_q"][:, 2], -displacement(hexfem)[:, 2] * 1000.0,
-                    s=8, alpha=0.4, label="FEM hex", color="tab:green")
-    plt.plot(za, ua, "k--", lw=1.5, label="analytic 1-D bar")
+                    s=8, alpha=0.4, label="FEM hex", color=style.COLOR["fem_hex"])
+    plt.plot(za, ua, color=style.COLOR["analytic"], ls=style.ANALYTIC_LS, lw=1.5, label="analytic 1-D bar")
     plt.xlabel("original height z  [m]")
     plt.ylabel("downward displacement  [mm]")
     plt.title("Hanging bar: displacement profile")
     plt.legend()
     plt.grid(alpha=0.3)
-    out = os.path.join(params.FIG_DIR, "hanging_bar_profile.png")
     plt.tight_layout()
-    plt.savefig(out, dpi=130)
-    plt.close()
-    print(f"[compare] wrote {out}")
+    return fig
 
 
-def plot_settling(newtons):
-    """Settling history (tip height + kinetic energy) of the canonical XPBD run."""
-    d = next((d for label, d, _ in newtons if label == "Newton XPBD"), newtons[0][1])
-    hist = d["history"]
-    if hist.size == 0:
-        return
-    t, tip_z, ke = hist[:, 0], hist[:, 1], hist[:, 2]
-    fig, ax1 = plt.subplots(figsize=(6, 4))
-    ax1.plot(t, tip_z, color="tab:orange")
-    ax1.set_xlabel("time [s]")
-    ax1.set_ylabel("tip height z [m]", color="tab:orange")
-    ax2 = ax1.twinx()
-    ax2.semilogy(t, np.maximum(ke, 1e-12), color="tab:green", alpha=0.6)
-    ax2.set_ylabel("kinetic energy [J]", color="tab:green")
-    plt.title("Hanging bar: Newton settling (XPBD)")
-    out = os.path.join(params.FIG_DIR, "hanging_bar_settling.png")
+def make_settling(newtons, fem):
+    """Settling of every Newton solver, two panels (-> Figure, or None if no history):
+
+      * left  -- tip-height trajectory vs the *static* FEM / analytic equilibrium
+                 (horizontal reference lines): did each solver settle, and to WHERE?
+      * right -- kinetic-energy decay to rest (the "reached equilibrium" check).
+
+    FEM is a static solve (no transient), so it enters only as the target line.
+    """
+    rest = fem["rest_q"]
+    z_top = rest[fem["fixed_nodes"], 2].mean()
+    z_bot = rest[:, 2].min()
+    tip_node = int(newtons[0][1]["tip_node"])
+    fem_tip_z = float(fem["final_q"][tip_node, 2])
+    analytic_tip_z = z_bot - params.analytic_hanging_displacement(z_bot, z_top, params.BLOCK_LZ)
+
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(11, 4))
+    plotted = False
+    for label, d, color in newtons:
+        hist = d["history"]
+        if hist.size == 0:
+            continue
+        plotted = True
+        axL.plot(hist[:, 0], hist[:, 1], color=color, label=label)
+        axR.semilogy(hist[:, 0], np.maximum(hist[:, 2], 1e-12), color=color, label=label)
+    if not plotted:
+        plt.close(fig)
+        return None
+    axL.axhline(fem_tip_z, color=style.COLOR["fem"], ls=style.ANALYTIC_LS, lw=1.5, label="FEM tet (static)")
+    axL.axhline(analytic_tip_z, color=style.COLOR["analytic"], ls=style.ANALYTIC_LS, lw=1.2, label="analytic 1-D")
+    axL.set_xlabel("time [s]"); axL.set_ylabel("tip height z [m]")
+    axL.set_title("Tip settles toward the FEM / analytic target?")
+    axL.legend(); axL.grid(alpha=0.3)
+    axR.set_xlabel("time [s]"); axR.set_ylabel("kinetic energy [J]  (log scale)")
+    axR.set_title("Newton settling: kinetic energy decays to rest")
+    axR.legend(); axR.grid(alpha=0.3)
     fig.tight_layout()
-    fig.savefig(out, dpi=130)
-    plt.close(fig)
-    print(f"[compare] wrote {out}")
+    return fig
 
 
-def plot_error_hist(newtons, fem):
-    """Per-node displacement error of each Newton solver vs tet-FEM."""
+def make_error_hist(newtons, fem):
+    """Per-node displacement error of each Newton solver vs tet-FEM -> Figure."""
     free = np.setdiff1d(np.arange(len(fem["rest_q"])), fem["fixed_nodes"])
-    plt.figure(figsize=(6, 4))
+    fig = plt.figure(figsize=(6, 4))
     for label, d, color in newtons:
         err = np.linalg.norm(displacement(d) - displacement(fem), axis=1)[free] * 1000.0
         plt.hist(err, bins=40, alpha=0.6, label=f"{label} vs FEM tet", color=color)
@@ -164,20 +182,28 @@ def plot_error_hist(newtons, fem):
     plt.ylabel("count")
     plt.title("Hanging bar: node-for-node error")
     plt.legend()
-    out = os.path.join(params.FIG_DIR, "hanging_bar_error_hist.png")
     plt.tight_layout()
-    plt.savefig(out, dpi=130)
-    plt.close()
-    print(f"[compare] wrote {out}")
+    return fig
 
 
 def main():
+    # The CLI/pipeline runs headless and writes PNGs; the make_* helpers above stay
+    # backend-agnostic so notebooks can import them and render the same figures inline.
+    matplotlib.use("Agg")
     os.makedirs(params.FIG_DIR, exist_ok=True)
     newtons, fem, hexfem = _load()
     report(newtons, fem, hexfem)
-    plot_profile(newtons, fem, hexfem)
-    plot_settling(newtons)
-    plot_error_hist(newtons, fem)
+    for fig, name in (
+        (make_profile(newtons, fem, hexfem), "hanging_bar_profile.png"),
+        (make_settling(newtons, fem), "hanging_bar_settling.png"),
+        (make_error_hist(newtons, fem), "hanging_bar_error_hist.png"),
+    ):
+        if fig is None:
+            continue
+        out = os.path.join(params.FIG_DIR, name)
+        fig.savefig(out, dpi=130)
+        plt.close(fig)
+        print(f"[compare] wrote {out}")
 
 
 if __name__ == "__main__":
