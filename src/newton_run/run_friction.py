@@ -4,7 +4,7 @@ Same scenario as fenics_run/run_friction.py: a flat soft block rests on a rigid
 ground plane under gravity, and its TOP face is dragged tangentially (+x) in small
 kinematic increments. Coulomb friction at the floor is set via `soft_contact_mu`.
 
-The headline, on-message point: the fast positional XPBD enforces friction as a
+The point: the fast positional XPBD enforces friction as a
 positional projection and exposes NO calibrated tangential force -- exactly as it
 exposes no calibrated normal contact force. So the comparison axis here is the
 kinematic response:
@@ -15,7 +15,7 @@ kinematic response:
 The FEM run provides the actual friction force and dissipated work; this run shows
 what each Newton solver can and cannot give.
 
-Solver note: like the flagship hanging bar, this runs all three Newton solvers via
+Solver note: like the hanging bar, this runs all three Newton solvers via
 ``--solver xpbd|vbd|semi_implicit`` (default XPBD). The collider is just the static
 ground plane, so the only contact is particle-vs-ground through the shared soft_contact
 buffer (VBD/SemiImplicit read soft_contact_mu for Coulomb exactly as XPBD does); no rigid

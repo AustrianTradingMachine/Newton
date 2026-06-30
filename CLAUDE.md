@@ -5,9 +5,9 @@
 A quantitative, apples-to-apples comparison of one **deformable soft body** simulated two ways:
 
 - **NVIDIA Newton** (on Warp, CUDA) — three solvers: **XPBD** (fast positional projection), **VBD** (implicit), **SemiImplicit** (explicit, differentiable);
-- **FEniCSx / dolfinx** — gold-standard **implicit FEM**.
+- **FEniCSx / dolfinx** — **implicit FEM** (the reference solve).
 
-The goal is to make it **measurable** how far Newton's fast solvers deviate from an accurate FEM solve of the *same* physical problem — same mesh, same compressible Neo-Hookean material, same gravity; only the solver differs — with closed-form analytic solutions as ground truth where they exist.
+The goal is to make it **measurable** how far Newton's fast solvers deviate from an accurate FEM solve of the *same* physical problem — same mesh, same compressible Neo-Hookean material, same gravity; only the solver differs — with closed-form analytic solutions as analytic references where they exist.
 
 Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capable machine**; the easiest is **Google Colab** (free GPU, A100/high-RAM comfortable). FEniCSx is CPU (installed via fem-on-colab, or conda-forge locally). The repo is public on GitHub so Colab opens it directly.
 
@@ -19,7 +19,7 @@ Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capa
 
   | module stem | scenario | what it does |
   |---|---|---|
-  | `hanging_bar` | **flagship** | a soft bar stretches under self-weight; a closed-form answer exists, so every solver is scored against ground truth |
+  | `hanging_bar` | **closed-form** | a soft bar stretches under self-weight; a closed-form answer exists, so every solver is scored against an analytic reference |
   | `indentation` | contact | a rigid sphere is pressed into a soft slab |
   | `drop` | dynamic impact | a sphere is dropped onto a block resting on the ground |
   | `friction` | Coulomb friction | a block is dragged across a rigid floor |
@@ -52,7 +52,7 @@ src/compare/{hanging_bar,indentation,drop,friction,stress_strain,convergence}.py
 src/compare/energies.py             pure-numpy diagnostics (strain energy, nodal forces, residual, Jacobian)
 tests/test_energies.py          validates the diagnostics (no GPU/FEM needed)
 00_setup.ipynb            install + run the whole pipeline (any CUDA GPU); each stage -> logs/summary.txt (OK/ERR health report)
-10_hanging_bar.ipynb            flagship analysis: XPBD / VBD / explicit vs FEM tet/hex vs analytic
+10_hanging_bar.ipynb            hanging-bar analysis: XPBD / VBD / explicit vs FEM tet/hex vs analytic
 20_indentation.ipynb            contact: force vs Hertz, dimple, penalty-vs-AL penetration
 30_convergence.ipynb            discretisation error vs solver error
 40_friction.ipynb               Coulomb friction force / work / slip

@@ -1,4 +1,4 @@
-"""Hanging bar -- Newton's superpower: DIFFERENTIABLE simulation for evaluation.
+"""Hanging bar -- differentiable simulation for evaluation.
 
 Newton is built on NVIDIA Warp, so the whole simulation is differentiable: we can
 backpropagate a loss through the settling of the soft body and get exact gradients
@@ -9,7 +9,8 @@ We use this two ways, both against the FEM reference (data/fem_result.npz):
   1. SENSITIVITY (one forward+backward, robust):
        loss(theta) = || q_newton_settled(theta) - q_fem ||^2  over all nodes,
      where theta scales the Lame parameters (k_mu, k_lambda). dLoss/dtheta is the
-     exact sensitivity of the Newton-vs-FEM mismatch to stiffness -- for free.
+     exact sensitivity of the Newton-vs-FEM mismatch to stiffness, in a single
+     backward pass.
 
   2. INVERSE FIT (gradient descent):
      optimise theta so Newton's settled shape matches the FEM solution. The fitted

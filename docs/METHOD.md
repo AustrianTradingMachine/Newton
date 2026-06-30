@@ -9,7 +9,7 @@ single source of truth both sides import.
 ## 1. The problem: a soft bar hanging under its own weight
 
 A soft block is **clamped on its top face** (max-z) and hangs downward; gravity
-(−z) stretches it. We deliberately picked this as the flagship because it is the
+(−z) stretches it. We deliberately picked this case because it is the
 one configuration with a **closed-form reference**, so every solver can be scored
 against an answer rather than only against each other.
 

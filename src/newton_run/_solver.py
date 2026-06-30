@@ -1,6 +1,6 @@
 """Shared Newton solver factory.
 
-Maps a solver name to a Newton solver instance, so every scenario -- the flagship
+Maps a solver name to a Newton solver instance, so every scenario -- the
 hanging bar AND the contact scenarios (indentation, drop, friction) -- selects
 XPBD / VBD / SemiImplicit from one place. This is what lets the contact comparison
 be apples-to-apples: the implicit VBD is the natural counterpart to the implicit

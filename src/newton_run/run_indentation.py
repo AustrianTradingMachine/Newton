@@ -7,13 +7,13 @@ whose centre is lowered in the same indentation steps as the FEM run, and the
 slab bottom is clamped.
 
 Why kinematic + clamped: it mirrors the FEM indentation benchmark so the deformed
-shapes are comparable. The headline difference we want to show is that the fast
+shapes are comparable. The difference we want to show is that the fast
 positional XPBD has *no calibrated contact stiffness* -- it enforces contact as a
 positional projection -- so the meaningful comparison axis is the DEFORMATION /
 PENETRATION, not a contact force (XPBD does not expose one cleanly; the FEM penalty
 run does).
 
-Solver note: like the flagship hanging bar, this runs all three Newton solvers via
+Solver note: like the hanging bar, this runs all three Newton solvers via
 ``--solver xpbd|vbd|semi_implicit`` (default XPBD, the canonical run). All three drive the
 SAME contact -- the kinematic sphere couples to the soft grid through the shared
 soft_contact buffer (model.collide + model.soft_contact_*), the wiring Newton's own

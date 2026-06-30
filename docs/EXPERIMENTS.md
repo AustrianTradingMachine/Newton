@@ -129,7 +129,7 @@ halves against the analytic and FEM tip references.
 
 ---
 
-## 4. The differentiable θ\* fit — Newton's distinctive capability
+## 4. The differentiable θ\* fit
 
 Newton is built on NVIDIA Warp, so the whole simulation is **differentiable**: we can
 backpropagate a loss through the settling of the soft body and get exact gradients

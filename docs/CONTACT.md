@@ -7,10 +7,10 @@ obstacle is a **rigid analytic shape** whose gap to the deformed surface is
 closed-form. That keeps the whole contact law inside the variational form and
 auditable.
 
-The headline both scenarios make: **FEM yields a calibrated contact force; XPBD does
+What both scenarios show: **FEM yields a calibrated contact force; XPBD does
 not.** XPBD enforces non-penetration by positional projection and exposes no
 comparable force, so the honest common axis is the deformation, and the force curve
-is something the fast solver simply cannot provide.
+is something the fast solver cannot provide.
 
 > **A note on fairness.** Each contact scenario can run **all three** Newton solvers via
 > `--solver xpbd|vbd|semi_implicit` (default XPBD, the canonical run) — so the **implicit

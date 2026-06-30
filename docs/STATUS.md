@@ -59,7 +59,7 @@ rename — so they are **pending a clean re-run** on the renamed pipeline.
   *separate* tool that characterises the **SemiImplicit** solver vs. FEM, **not** XPBD;
   see the honesty rules below.)
 
-> Reproduce Tier 2 yourself: run `00_setup.ipynb` §1–§4 (setup), then the scenarios §5–§13
+> Reproduce Tier 2 yourself: run `00_setup.ipynb` §1–§4 (setup), then the scenarios §5–§11
 > — each one streams its result and appends to `logs/summary.txt` (the OK/ERR health report) —
 > then the `10/20/30/40_*` notebooks. Numbers will be re-recorded here with the run date once the renamed
 > pipeline has been executed on Colab.
@@ -103,7 +103,7 @@ be treated as work-in-progress until they have a clean Colab run.
 1. `pip install -e .` — registers `common` / `newton_run` / `fenics_run` / `compare`.
 2. `pytest tests/` — Tier 1, no GPU needed.
 3. `00_setup.ipynb` on a CUDA GPU (Colab A100/high-RAM, or any CUDA machine) — installs Newton + dolfinx, runs
-   the scenarios §5–§13; each stage appends to `logs/summary.txt` (the OK/ERR health log).
+   the scenarios §5–§11; each stage appends to `logs/summary.txt` (the OK/ERR health log).
 4. `10/20/30/40_*.ipynb` — the verdict-first analysis notebooks.
 
 See [METHOD.md](METHOD.md), [CONTACT.md](CONTACT.md), and

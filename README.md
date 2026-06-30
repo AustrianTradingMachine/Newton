@@ -3,11 +3,11 @@
 A quantitative, apples-to-apples comparison of one **deformable soft body** simulated two ways:
 
 - **NVIDIA Newton** (on Warp, CUDA) — three solvers: **XPBD** (fast positional projection), **VBD** (implicit), **SemiImplicit** (explicit, differentiable);
-- **FEniCSx / dolfinx** — gold-standard **implicit FEM**.
+- **FEniCSx / dolfinx** — **implicit FEM**, used as the reference solve.
 
 Same mesh, same compressible Neo-Hookean material, same gravity — *only the solver differs*. The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Headline (hanging bar):** on the one test with a known answer, FEM and Newton **VBD** land on the analytic value; **XPBD** settles a few percent soft — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
+> **Hanging bar (the one test with a known answer):** FEM and Newton **VBD** land on the analytic value; **XPBD** settles a few percent soft — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
 
 ### The references are layered: analytic → FEM → Newton
 
@@ -21,7 +21,7 @@ follow the whole trust chain, not just take FEM on faith:
 - the **Hertz** sphere-on-half-space force (indentation, an *approximate* anchor for a
   finite soft slab).
 
-The FEM (the gold standard) is itself checked against these analytic solutions in the
+The FEM (the reference) is itself checked against these analytic solutions in the
 simple cases; the fast Newton solvers are then scored against the FEM on the *same*
 mesh and material. So the comparison is **analytic → FEM → Newton**, with each link
 testable.
@@ -30,16 +30,14 @@ testable.
 
 | scenario | what it does | the point |
 |---|---|---|
-| **hanging bar** ⭐ | a soft bar stretches under self-weight | the only case with a *closed-form* (analytic) reference → score every solver against it, with the FEM solve as the gold standard |
+| **hanging bar** | a soft bar stretches under self-weight | the only case with a *closed-form* (analytic) reference → score every solver against it, with the FEM solve as the reference |
 | **indentation** | a rigid sphere is pressed into a soft slab | FEM gives a calibrated contact-force curve; the fast XPBD gives deformation, not a force (VBD/explicit selectable via `--solver`) |
-| **drop** | a sphere is dropped onto a block (dynamic impact) | transient impact; FEM Newmark + contact vs. Newton solvers (implicit VBD is the natural match; see fairness note) |
+| **drop** | a sphere is dropped onto a block (dynamic impact) | transient impact; FEM Newmark + contact vs. Newton solvers (implicit VBD is the natural match; see [docs/CONTACT.md](docs/CONTACT.md)) |
 | **friction** | a block is dragged on a rigid floor | FEM friction force + dissipated work vs. analytic `μ·W`; XPBD slip only |
 | **material test** | confined uniaxial squeeze/stretch | stress vs. stretch into large strain (constitutive fidelity) |
 | **convergence** | swept budgets / meshes | discretisation error (FEM) vs. solver-budget error (XPBD) |
 
-Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/<x>.py` (the overlay). The analysis lives in the `10/20/30/40_*` notebooks, each written as a **10-minute read for a skeptical expert** (verdict first, then the mechanism), with a rendered 3D scene of what is being simulated.
-
-> **Fairness note.** The **contact** scenarios (indentation / drop / friction) run **all three** Newton solvers via `--solver` on the *same* `soft_contact` scene (the wiring Newton's own `example_rigid_soft_contact` uses for every solver), so the implicit **VBD** is the apples-to-apples partner for the implicit FEM — not just XPBD. Whether the *pinned* Newton version supports the VBD soft/rigid-contact path is version-dependent and still `TODO[verify-on-colab]` (on an older pin only XPBD records a result); the **drop** is the hardest case (free sphere, two-way coupling) and only a *partial* fairness fix vs. implicit Newmark. "No calibrated contact force" remains an **XPBD** limitation. See [docs/CONTACT.md](docs/CONTACT.md).
+Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/<x>.py` (the overlay). The analysis lives in the `10/20/30/40_*` notebooks, each written as a **10-minute read for a skeptical expert** (verdict first, then the mechanism), with a rendered 3D scene of what is being simulated. The contact scenarios (indentation / drop / friction) run all three Newton solvers via `--solver` on the same `soft_contact` scene, so the implicit **VBD** — not just XPBD — is the apples-to-apples partner for the implicit FEM; [docs/CONTACT.md](docs/CONTACT.md) covers the version caveats and what "no calibrated contact force" does and does not mean.
 
 ## The three Newton solvers
 
