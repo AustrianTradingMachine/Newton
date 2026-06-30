@@ -104,8 +104,8 @@ def make_fem(fm):
     ax.plot(fm["load_steps"], fm["ls_tip"], "o-", color=style.COLOR["fem"], label="tip drop [mm]")
     ax.set_xlabel("# gravity load increments"); ax.set_ylabel("tip drop [mm]", color=style.COLOR["fem"])
     ax2 = ax.twinx()
-    ax2.plot(fm["load_steps"], fm["ls_its"], "s--", color=style.NEUTRAL[1], label="total Newton its")
-    ax2.set_ylabel("total Newton iterations", color=style.NEUTRAL[1])
+    ax2.plot(fm["load_steps"], fm["ls_its"], "s--", color=style.NEUTRAL[1], label="Newton-Raphson its")
+    ax2.set_ylabel("Newton-Raphson iterations", color=style.NEUTRAL[1])  # FEM nonlinear solve, not the Newton framework
     ax.set_title("FEM load-increment sweep (tip flat = solve OK)"); ax.grid(alpha=0.3)
 
     fig.suptitle("Hanging bar convergence -- FEM (FEniCSx, h-refinement)")

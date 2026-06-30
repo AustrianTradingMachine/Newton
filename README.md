@@ -7,7 +7,7 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 
 Same mesh, same material parameters (Lamé μ, λ), same gravity — *only the solver differs* (the FEM side uses a compressible Neo-Hookean law, Newton an StVK/co-rotational one at the same μ, λ — equal at small strain). The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Hanging bar (closed-form *deformation*):** it is the case whose analytic answer is the deformation itself — the 1-D self-weight tip elongation — so every solver is scored node-for-node against it (the other scenarios have analytic anchors too, but for a force or stress, not the whole deformed field). FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits). The Newton solvers, at this run's budgets, all settle far **softer** — XPBD ≈ 3.7×, VBD ≈ 3.2×, explicit ≈ 2.0× the FEM tip — for two different reasons: XPBD *projects* positions instead of solving the force balance (a finite equilibrium residual it never drives out), while VBD's block Gauss-Seidel has not converged on this slender bar at the iteration budget used. The explicit solver is the closest of the three; VBD does **not** track FEM here. The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
+> **Headline (hanging bar):** at a fast budget all three Newton solvers settle noticeably **softer** than the FEM/analytic answer — the explicit solver is closest, and the implicit **VBD does not automatically track FEM**. Exact tip ratios with provenance: **[docs/STATUS.md](docs/STATUS.md)**; the *why* (XPBD's force-balance residual vs. VBD's unconverged iterations): [`10_hanging_bar`](10_hanging_bar.ipynb).
 
 ### The references are layered: analytic → FEM → Newton
 
@@ -19,20 +19,26 @@ follow the whole trust chain, not just take FEM on faith:
 - the **confined uniaxial Neo-Hookean stress law** (material test) — matched **to
   machine precision** by a test in [`tests/`](tests/test_energies.py);
 - the **Coulomb `μ·W` plateau** and `N = W` (friction);
-- the **Hertz** sphere-on-half-space force (indentation, an *approximate* anchor for a
-  finite soft slab).
+- the **Hertz** sphere-on-half-space force `F = (4/3)·E*·√R·δ^(3/2)` (indentation, an
+  *approximate* anchor for a finite soft slab; the full contact method — penalty / AL law,
+  Hertz derivation, Newmark drop — is in [docs/CONTACT.md](docs/CONTACT.md)).
 
-The FEM (the reference) is itself checked against these analytic solutions in the
-simple cases; the fast Newton solvers are then scored against the FEM on the *same*
-mesh and material. So the comparison is **analytic → FEM → Newton**, with each link
-testable.
+**What the FEM reference *is* (for non-FEM readers):** a finite-element solve in
+FEniCSx/dolfinx that discretises the body into small elements and *solves the
+discretised force balance to convergence* — a genuine static equilibrium (net nodal
+force ≈ 0), unlike a fast positional solver that only projects positions. Its material
+is a **compressible Neo-Hookean** law (hyperelastic, i.e. rubber-like) at the Lamé
+parameters μ (shear modulus — resistance to change of shape) and λ (volumetric
+stiffness). The FEM is itself checked against these analytic solutions in the simple
+cases; the fast Newton solvers are then scored against it on the *same* mesh and
+material. So the comparison is **analytic → FEM → Newton**, with each link testable.
 
 ## The scenarios (named for what they do)
 
 | scenario | what it does | the point |
 |---|---|---|
 | **hanging bar** | a soft bar stretches under self-weight | a closed-form *deformation* (1-D tip elongation) to score every solver against node-for-node — with the FEM solve as the reference |
-| **indentation** | a rigid sphere is pressed into a soft slab | FEM gives a calibrated contact-force curve; the fast XPBD gives deformation, not a force (VBD/explicit selectable via `--solver`) |
+| **indentation** | a rigid sphere is pressed into a soft slab | FEM gives a calibrated contact-force curve; the fast XPBD gives deformation, not a force (VBD/explicit selectable via `--solver`; method in [docs/CONTACT.md](docs/CONTACT.md)) |
 | **drop** | a sphere is dropped onto a block (dynamic impact) | transient impact; FEM Newmark + contact vs. Newton solvers (implicit VBD is the natural match; see [docs/CONTACT.md](docs/CONTACT.md)) |
 | **friction** | a block is dragged on a rigid floor | FEM friction force + dissipated work vs. analytic `μ·W`; XPBD slip only |
 | **material test** | confined uniaxial squeeze/stretch | stress vs. stretch into large strain (constitutive fidelity) |

@@ -48,7 +48,7 @@ steady slip. → `data/fem_friction.npz`.
 ### The Newton side (`newton_run/run_friction.py`, all three solvers)
 
 `run_friction.py --solver xpbd|vbd|semi_implicit` drags the block on the shared
-ground-contact scene (default XPBD; VBD/SemiImplicit version-gated `TODO[verify-on-colab]`).
+ground-contact scene (default XPBD; the VBD/SemiImplicit path needs a recent Newton build).
 Coulomb friction is set via `soft_contact_mu`, the top face is pinned and dragged.
 As with normal contact, the fast positional **XPBD exposes no calibrated tangential
 force** — so the axis here is the kinematic response: mean bottom slip vs. top drag (the

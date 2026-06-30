@@ -27,7 +27,10 @@ stress, not the whole deformed body.)
 Gravity is set **explicitly** on the Newton builder (`gravity=-GRAVITY`) because
 Newton's default is −9.81; this matches FEM to the same constant. The resulting
 tip strain is ≈ 2.8 % — small enough that linear bar theory is a meaningful anchor,
-large enough that the nonlinear terms are exercised.
+large enough that the nonlinear terms are exercised. (μ is the **shear modulus** —
+resistance to change of shape; λ sets the **volumetric stiffness** — resistance to
+change of volume; the row above converts them to the equivalent Young's modulus E and
+Poisson ratio ν.)
 
 ### The closed-form anchor
 
@@ -59,15 +62,18 @@ is the solver. Two mechanisms enforce that:
   clamped-node indices to `data/mesh.npz`
   ([`common/mesh_io.py`](../src/common/mesh_io.py)). The FEM tet run *consumes those exact
   arrays* (`create_mesh(comm, cells, element, x)`) and evaluates its solution at
-  Newton's node positions, so the two results are comparable **node-for-node**. Tets
-  are defensively re-oriented to positive volume for dolfinx
-  (`orient_tets_positive`).
+  Newton's node positions, so the two results are comparable **node-for-node** (the
+  point evaluation uses dolfinx's point-location API, currently `TODO[verify-on-colab]`
+  — see [STATUS.md](STATUS.md) — so the per-node error numbers depend on that re-run). Tets
+  are defensively re-oriented to positive volume for dolfinx (`orient_tets_positive`).
 - **One material.** Newton's `add_soft_grid` uses a co-rotational tetrahedral FEM
   model parameterised by Lamé (μ, λ). FEniCSx uses a **compressible Neo-Hookean**
-  strain-energy density with the *same* (μ, λ):
+  strain-energy density — a *hyperelastic* (rubber-like) law whose stored energy ψ
+  depends on each element's stretch via the deformation gradient `F = I + ∇u` — with
+  the *same* (μ, λ):
 
   ```
-  ψ = μ/2 (I_C − 3) − μ ln J + λ/2 (ln J)²,     P = ∂ψ/∂F      (1st Piola–Kirchhoff)
+  ψ = μ/2 (I_C − 3) − μ ln J + λ/2 (ln J)²,    P = ∂ψ/∂F   (1st Piola–Kirchhoff stress: force per unit *rest* area)
   ```
 
   The same ψ is used by the pure-numpy diagnostics (§4), so Newton's settled state
@@ -162,7 +168,11 @@ same quantities for *either* solver from `(rest_q, final_q, tets)`:
   free-node residual ≈ 0; for XPBD it is finite and measures how far the *projected*
   state is from the *material's* force balance. At the clamped nodes, `−Σ r_z` is the
   support reaction, which must equal the total weight `ρgV` (≈ 565 N for this block)
-  — a built-in consistency check.
+  — a built-in consistency check. (For Newton, `r` is computed with the Neo-Hookean ψ
+  above, *not* the co-rotational/StVK law Newton actually integrated, so it folds a
+  small constitutive-mismatch term — bounded by the ≈ 2.8 % tip strain — into the
+  otherwise pure solve-vs-project gap; the material test isolates that constitutive
+  difference on its own.)
 
 ### The honesty backbone: `tests/test_energies.py`
 
