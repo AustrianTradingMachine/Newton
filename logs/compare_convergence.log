@@ -1,4 +1,0 @@
-[conv] wrote /content/Newton/figures/convergence_newton.png
-[conv] XPBD residual: 31.2 N @ 1 iters -> 7.01 N @ 32 iters
-[conv] wrote /content/Newton/figures/convergence_fem.png
-[conv] FEM tip converges to 43.676 mm (analytic 1-D 44.303 mm); load-step spread = 1.74e-08 mm
