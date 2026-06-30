@@ -143,8 +143,17 @@ SIM_SUBSTEPS_EXPLICIT = 32
 # -- closer in spirit to the FEM solve than XPBD's positional projection, and the
 # natural volumetric soft-body counterpart to XPBD. run_hanging_bar runs the required
 # builder.color() for this solver.
+#
+# ITERATIONS matter a lot here. VBD is block Gauss-Seidel: a single iteration only
+# propagates the clamp constraint ~one vertex layer. This bar is 16 cells = 17 node
+# layers tall, so with too few iterations the clamp's influence never reaches the tip
+# and VBD settles (KE -> 0) at a FALSE, far-too-soft equilibrium (observed: 10 iters ->
+# tip ~606 mm vs analytic ~44 mm / FEM ~43 mm, even though it settles cleanly). Gauss-
+# Seidel needs O(layers) iterations to propagate and more to converge, so we use 50.
+# TODO[verify-on-colab]: confirm 50 pulls the VBD tip toward FEM/analytic; if it is still
+# notably soft, raise toward 100 (slender structures are VBD's worst case for convergence).
 SIM_SUBSTEPS_VBD = 10
-VBD_ITERATIONS = 10
+VBD_ITERATIONS = 50
 MAX_FRAMES = 600                 # hard cap on the settling loop
 SETTLE_KE_TOL = 1.0e-6           # kinetic energy threshold to call it settled
 MIN_SETTLE_FRAMES = 60           # never stop before this many frames
