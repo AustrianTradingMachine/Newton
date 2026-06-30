@@ -1,0 +1,3 @@
+[stress] wrote /content/Newton/figures/stress_strain.png
+[stress] FEM   : max abs. deviation vs analytic = 5.24e-12 kPa (at lambda=0.75); at lambda=1.50: 21.8 vs 21.8 kPa
+[stress] Newton: max abs. deviation vs analytic = 0.0999 kPa (at lambda=0.70); at lambda=1.50: 21.8 vs 21.8 kPa

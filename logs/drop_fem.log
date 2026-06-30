@@ -1,0 +1,19 @@
+[drop-fem] dolfinx 0.11.0.post0
+[drop-fem] block 0.80x0.80x0.50, sphere R=0.25 m=32.725 kg, dt=0.001 steps=400, kn=5.67e+06, cd=567
+[drop-fem] t=0.000s  sphere_z=1.100  pen=0.00mm  F=0N  its=2
+[drop-fem] t=0.025s  sphere_z=1.097  pen=0.00mm  F=9.68N  its=2
+[drop-fem] t=0.050s  sphere_z=1.087  pen=0.00mm  F=65.5N  its=2
+[drop-fem] t=0.075s  sphere_z=1.073  pen=0.00mm  F=157N  its=2
+[drop-fem] t=0.100s  sphere_z=1.056  pen=0.00mm  F=212N  its=2
+[drop-fem] t=0.125s  sphere_z=1.037  pen=0.00mm  F=224N  its=2
+[drop-fem] t=0.150s  sphere_z=1.015  pen=0.00mm  F=228N  its=2
+[drop-fem] t=0.175s  sphere_z=0.993  pen=0.00mm  F=225N  its=2
+[drop-fem] t=0.200s  sphere_z=0.968  pen=0.00mm  F=252N  its=2
+[drop-fem] t=0.225s  sphere_z=0.942  pen=0.00mm  F=269N  its=2
+[drop-fem] t=0.250s  sphere_z=0.915  pen=0.00mm  F=265N  its=2
+[drop-fem] t=0.275s  sphere_z=0.886  pen=0.00mm  F=263N  its=2
+[drop-fem] t=0.300s  sphere_z=0.857  pen=0.00mm  F=252N  its=2
+[drop-fem] t=0.325s  sphere_z=0.827  pen=0.00mm  F=253N  its=2
+[drop-fem] t=0.350s  sphere_z=0.795  pen=0.00mm  F=248N  its=2
+[drop-fem] t=0.375s  sphere_z=0.761  pen=0.00mm  F=236N  its=2
+[drop-fem] wrote /content/Newton/data/fem_drop.npz

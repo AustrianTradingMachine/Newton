@@ -1,0 +1,17 @@
+[fem] dolfinx 0.11.0.post0, element=hex
+Block            : 0.60 x 0.60 x 1.60 m (6x6x16 cells)
+Density          : 100.0 kg/m^3
+Lame (mu, lambda): 1.000e+04, 5.000e+04 Pa
+-> Young's E, nu : 2.833e+04 Pa, 0.4167
+Gravity          : 9.80665 m/s^2 (-z)
+Analytic tip elongation (1-D bar): 44.30 mm
+
+[fem] load step 1/5: snes_its=3 reason=2
+[fem] load step 2/5: snes_its=3 reason=2
+[fem] load step 3/5: snes_its=3 reason=2
+[fem] load step 4/5: snes_its=3 reason=2
+[fem] load step 5/5: snes_its=3 reason=2
+[fem] element=hex: nodes=833 clamped=49
+[fem] wrote /content/Newton/data/fem_result_hex.npz
+[fem] max downward displacement = 43.40 mm
+[fem] solve wall time = 52.091 s

@@ -1,0 +1,99 @@
+[OK ] Newton hanging-bar (XPBD)
+      [newton] wrote /content/Newton/data/mesh.npz
+      [newton] wrote /content/Newton/data/newton_result.npz
+      [newton] tip vertical drop = 150.83 mm
+[OK ] Newton hanging-bar (VBD)
+      [newton] settled at frame 286 (KE=9.751e-07)
+      [newton] wrote /content/Newton/data/newton_result_vbd.npz
+      [newton] tip vertical drop = 139.53 mm
+[OK ] Newton hanging-bar (explicit)
+      [newton] settled at frame 419 (KE=9.993e-07)
+      [newton] wrote /content/Newton/data/newton_result_semi.npz
+      [newton] tip vertical drop = 82.76 mm
+[OK ] FEM hanging-bar tet
+      [fem] dolfinx 0.11.0.post0, element=tet
+      [fem] wrote /content/Newton/data/fem_result.npz
+      [fem] max downward displacement = 43.20 mm
+[OK ] FEM hanging-bar hex
+      [fem] dolfinx 0.11.0.post0, element=hex
+      [fem] wrote /content/Newton/data/fem_result_hex.npz
+      [fem] max downward displacement = 43.40 mm
+[OK ] Compare hanging-bar
+      [compare] wrote /content/Newton/figures/hanging_bar_profile.png
+      [compare] wrote /content/Newton/figures/hanging_bar_settling.png
+      [compare] wrote /content/Newton/figures/hanging_bar_error_hist.png
+[OK ] Stress-strain Newton
+      [stress-newton] wrote /content/Newton/data/newton_stress_strain.npz
+[OK ] Stress-strain FEM
+      [stress-fem] dolfinx 0.11.0.post0
+      [stress-fem] wrote /content/Newton/data/fem_stress_strain.npz  (max rel. dev. vs analytic = 1.56e-12)
+[OK ] Compare stress-strain
+      [stress] wrote /content/Newton/figures/stress_strain.png
+      [stress] FEM   : max abs. deviation vs analytic = 5.24e-12 kPa (at lambda=0.75); at lambda=1.50: 21.8 vs 21.8 kPa
+      [stress] Newton: max abs. deviation vs analytic = 0.0999 kPa (at lambda=0.70); at lambda=1.50: 21.8 vs 21.8 kPa
+[OK ] Newton indentation (XPBD)
+      [indent-newton] delta= 38.00 mm  pen=0.00 mm  U_strain=12.91 J  KE=3.38e-03 J
+      [indent-newton] delta= 40.00 mm  pen=0.00 mm  U_strain=13.48 J  KE=8.63e-03 J
+      [indent-newton] wrote /content/Newton/data/newton_indentation.npz
+[OK ] Newton indentation (VBD)
+      [indent-newton] delta= 38.00 mm  pen=32.74 mm  U_strain=0.09174 J  KE=7.02e-08 J
+      [indent-newton] delta= 40.00 mm  pen=34.43 mm  U_strain=0.1057 J  KE=6.96e-08 J
+      [indent-newton] wrote /content/Newton/data/newton_indentation_vbd.npz
+[OK ] Newton indentation (explicit)
+      [indent-newton] delta= 38.00 mm  pen=30.89 mm  U_strain=0.1693 J  KE=3.92e-04 J
+      [indent-newton] delta= 40.00 mm  pen=32.51 mm  U_strain=0.1926 J  KE=4.22e-04 J
+      [indent-newton] wrote /content/Newton/data/newton_indentation_semi.npz
+[OK ] FEM indentation
+      [indent-fem] wrote /content/Newton/figures/indentation_force.png
+      [indent-fem] wrote /content/Newton/figures/indentation_penetration.png
+      [indent-fem] wrote /content/Newton/figures/indentation_profile.png
+[OK ] Compare indentation
+      [compare-indent] wrote /content/Newton/figures/indentation_compare_profile.png
+      [compare-indent] wrote /content/Newton/figures/indentation_newton_penetration.png
+[OK ] Drop Newton (XPBD)
+      [drop-newton] t=0.250s  sphere_z=1.171  pen=0.00mm  U=86 KE=124
+      [drop-newton] t=0.333s  sphere_z=1.206  pen=0.00mm  U=101 KE=144
+      [drop-newton] wrote /content/Newton/data/newton_drop.npz
+[OK ] Drop Newton (VBD)
+      [drop-newton] t=0.250s  sphere_z=0.895  pen=0.00mm  U=1.15 KE=34.1
+      [drop-newton] t=0.333s  sphere_z=0.827  pen=0.00mm  U=2.93 KE=0.91
+      [drop-newton] wrote /content/Newton/data/newton_drop_vbd.npz
+[OK ] Drop Newton (explicit)
+      [drop-newton] t=0.250s  sphere_z=0.831  pen=0.00mm  U=192 KE=219
+      [drop-newton] t=0.333s  sphere_z=0.746  pen=0.00mm  U=7.54e+03 KE=194
+      [drop-newton] wrote /content/Newton/data/newton_drop_semi.npz
+[OK ] Drop FEM
+      [drop-fem] t=0.350s  sphere_z=0.795  pen=0.00mm  F=248N  its=2
+      [drop-fem] t=0.375s  sphere_z=0.761  pen=0.00mm  F=236N  its=2
+      [drop-fem] wrote /content/Newton/data/fem_drop.npz
+[OK ] Compare drop
+      [drop] wrote /content/Newton/figures/drop_strain_energy.png
+      [drop] wrote /content/Newton/figures/drop_kinetic_energy.png
+      [drop] wrote /content/Newton/figures/drop_contact_force.png
+[OK ] Newton convergence
+      [conv-newton] wrote /content/Newton/data/newton_convergence.npz
+[OK ] FEM convergence
+      [conv-fem] 6x6x16  h=100.0 mm  ndof=  2499  tip=43.396 mm  U=7.964 J  t=47.73 s
+      [conv-fem] 9x9x24  h= 66.7 mm  ndof=  7500  tip=43.676 mm  U=8.049 J  t=160.27 s
+      [conv-fem] wrote /content/Newton/data/fem_convergence.npz
+[OK ] Compare convergence
+      [conv] wrote /content/Newton/figures/convergence_newton.png
+      [conv] wrote /content/Newton/figures/convergence_fem.png
+[OK ] Newton friction (XPBD)
+      [friction-newton] wrote /content/Newton/data/newton_friction.npz
+[OK ] Newton friction (VBD)
+      [friction-newton] wrote /content/Newton/data/newton_friction_vbd.npz
+[OK ] Newton friction (explicit)
+      [friction-newton] wrote /content/Newton/data/newton_friction_semi.npz
+[OK ] FEM friction
+      [friction-fem] drag=20.00 mm  F=  74.97 N  N= 250.69 N  slip=13.18 mm  slipfrac=1.00  W_fric=0.959 J
+      [friction-fem] wrote /content/Newton/data/fem_friction.npz
+      [friction-fem] final F=74.97 N vs analytic plateau mu*W=75.32 N (N=250.69 N vs W=251.05 N)
+[OK ] Compare friction
+      [friction] wrote /content/Newton/figures/friction_force.png
+      [friction] wrote /content/Newton/figures/friction_work.png
+      [friction] wrote /content/Newton/figures/friction_slip.png
+[OK ] Diffsim theta*
+      [diffsim] fitted effective-stiffness multiplier theta* = 1.7867
+      [diffsim]   theta* > 1  => Newton effectively SOFTER than FEM (needs stiffening to match)
+      [diffsim]   theta* < 1  => Newton effectively STIFFER than FEM

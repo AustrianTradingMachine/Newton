@@ -1,0 +1,39 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[indent-newton] device = cuda:0, solver = xpbd
+Module validate_and_correct_inertia_kernel_2d598dcb 2d598dc load on device 'cuda:0' took 728.47 ms  (compiled)
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.05 ms  (cached)
+Module newton._src.solvers.solver c4f5217 load on device 'cuda:0' took 1.26 ms  (cached)
+Module newton._src.sim.collide 6396eb6 load on device 'cuda:0' took 1161.32 ms  (compiled)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.27 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.38 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 3.16 ms  (cached)
+Module newton._src.geometry.kernels 18b231c load on device 'cuda:0' took 6635.98 ms  (compiled)
+Module newton._src.solvers.xpbd.kernels 63a706b load on device 'cuda:0' took 9.72 ms  (cached)
+[indent-newton] delta=  2.00 mm  pen=0.00 mm  U_strain=3.894 J  KE=9.51e-02 J
+[indent-newton] delta=  4.00 mm  pen=0.00 mm  U_strain=2.006 J  KE=4.56e-02 J
+[indent-newton] delta=  6.00 mm  pen=0.00 mm  U_strain=2.347 J  KE=2.27e-02 J
+[indent-newton] delta=  8.00 mm  pen=0.00 mm  U_strain=2.718 J  KE=1.30e-02 J
+[indent-newton] delta= 10.00 mm  pen=0.00 mm  U_strain=2.718 J  KE=1.08e-02 J
+[indent-newton] delta= 12.00 mm  pen=0.00 mm  U_strain=3.164 J  KE=9.81e-03 J
+[indent-newton] delta= 14.00 mm  pen=0.00 mm  U_strain=3.552 J  KE=7.13e-03 J
+[indent-newton] delta= 16.00 mm  pen=0.00 mm  U_strain=3.967 J  KE=6.04e-03 J
+[indent-newton] delta= 18.00 mm  pen=0.00 mm  U_strain=4.456 J  KE=5.98e-03 J
+[indent-newton] delta= 20.00 mm  pen=0.00 mm  U_strain=5.227 J  KE=3.66e-03 J
+[indent-newton] delta= 22.00 mm  pen=0.00 mm  U_strain=5.831 J  KE=3.97e-03 J
+[indent-newton] delta= 24.00 mm  pen=0.00 mm  U_strain=6.516 J  KE=4.89e-03 J
+[indent-newton] delta= 26.00 mm  pen=0.00 mm  U_strain=7.255 J  KE=5.23e-03 J
+[indent-newton] delta= 28.00 mm  pen=0.00 mm  U_strain=7.981 J  KE=4.67e-03 J
+[indent-newton] delta= 30.00 mm  pen=0.00 mm  U_strain=8.637 J  KE=4.86e-03 J
+[indent-newton] delta= 32.00 mm  pen=0.00 mm  U_strain=9.518 J  KE=4.10e-03 J
+[indent-newton] delta= 34.00 mm  pen=0.00 mm  U_strain=10.39 J  KE=4.64e-03 J
+[indent-newton] delta= 36.00 mm  pen=0.00 mm  U_strain=11.35 J  KE=4.19e-03 J
+[indent-newton] delta= 38.00 mm  pen=0.00 mm  U_strain=12.91 J  KE=3.38e-03 J
+[indent-newton] delta= 40.00 mm  pen=0.00 mm  U_strain=13.48 J  KE=8.63e-03 J
+[indent-newton] wrote /content/Newton/data/newton_indentation.npz
+[indent-newton] solve wall time = 124.511 s (solver=xpbd)

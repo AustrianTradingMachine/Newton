@@ -1,0 +1,33 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[stress-newton] device = cuda:0
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.44 ms  (cached)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.18 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.65 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 2.87 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_particle f6c5585 load on device 'cuda:0' took 1.63 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_contact 953ff5f load on device 'cuda:0' took 2.33 ms  (cached)
+Module newton._src.solvers.solver c4f5217 load on device 'cuda:0' took 1.05 ms  (cached)
+[stress-newton] lambda=0.700  sigma=-3.286e+04 Pa
+[stress-newton] lambda=0.750  sigma=-2.503e+04 Pa
+[stress-newton] lambda=0.800  sigma=-1.845e+04 Pa
+[stress-newton] lambda=0.850  sigma=-1.283e+04 Pa
+[stress-newton] lambda=0.900  sigma=-7970 Pa
+[stress-newton] lambda=0.950  sigma=-3733 Pa
+[stress-newton] lambda=1.000  sigma=-6.14 Pa
+[stress-newton] lambda=1.050  sigma=3294 Pa
+[stress-newton] lambda=1.100  sigma=6238 Pa
+[stress-newton] lambda=1.150  sigma=8878 Pa
+[stress-newton] lambda=1.200  sigma=1.126e+04 Pa
+[stress-newton] lambda=1.250  sigma=1.343e+04 Pa
+[stress-newton] lambda=1.300  sigma=1.54e+04 Pa
+[stress-newton] lambda=1.350  sigma=1.72e+04 Pa
+[stress-newton] lambda=1.400  sigma=1.887e+04 Pa
+[stress-newton] lambda=1.450  sigma=2.041e+04 Pa
+[stress-newton] lambda=1.500  sigma=2.184e+04 Pa
+[stress-newton] wrote /content/Newton/data/newton_stress_strain.npz

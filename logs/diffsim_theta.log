@@ -1,0 +1,30 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[diffsim] device = cuda:0
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.52 ms  (cached)
+Module __main__ 4e6cddf load on device 'cuda:0' took 658.74 ms  (compiled)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.36 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.34 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 3.04 ms  (cached)
+Module newton._src.geometry.differentiable_contacts c0bf917 load on device 'cuda:0' took 387.91 ms  (compiled)
+Module newton._src.solvers.semi_implicit.kernels_particle f6c5585 load on device 'cuda:0' took 1.61 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_contact 953ff5f load on device 'cuda:0' took 2.22 ms  (cached)
+Module newton._src.solvers.solver c4f5217 load on device 'cuda:0' took 1.17 ms  (cached)
+[diffsim] at theta=1: mismatch loss = 2.748463e-01 m^2,  dLoss/dtheta = -1.149506e+01  (exact autodiff sensitivity)
+Module warp.optim.sgd 2a13639 load on device 'cuda:0' took 200.47 ms  (compiled)
+[diffsim] iter   0  loss=2.748462e-01  theta=1.1150  grad=-1.150e+01
+[diffsim] iter   5  loss=1.972752e-01  theta=0.9368  grad=1.329e+01
+[diffsim] iter  10  loss=7.649320e-01  theta=0.9574  grad=-1.309e+00
+[diffsim] iter  15  loss=6.527991e-02  theta=0.9594  grad=-1.135e+01
+[diffsim] iter  20  loss=3.788148e+00  theta=1.9597  grad=-1.175e+02
+[diffsim] iter  25  loss=5.446561e-02  theta=1.7920  grad=2.963e+00
+[diffsim] iter  29  loss=2.087369e-04  theta=1.7867  grad=6.187e-05
+[diffsim] wrote /content/Newton/data/diffsim.npz
+[diffsim] fitted effective-stiffness multiplier theta* = 1.7867
+[diffsim]   theta* > 1  => Newton effectively SOFTER than FEM (needs stiffening to match)
+[diffsim]   theta* < 1  => Newton effectively STIFFER than FEM

@@ -1,0 +1,56 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[newton] device = cuda:0, solver = xpbd
+Block            : 0.60 x 0.60 x 1.60 m (6x6x16 cells)
+Density          : 100.0 kg/m^3
+Lame (mu, lambda): 1.000e+04, 5.000e+04 Pa
+-> Young's E, nu : 2.833e+04 Pa, 0.4167
+Gravity          : 9.80665 m/s^2 (-z)
+Analytic tip elongation (1-D bar): 44.30 mm
+
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1575.26 ms  (compiled)
+[newton] nodes=833 tets=2880 fixed=49 tip_node=24
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 3046.71 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 7720.72 ms  (compiled)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 1816.64 ms  (compiled)
+Module newton._src.solvers.solver c4f5217 load on device 'cuda:0' took 1087.57 ms  (compiled)
+Module newton._src.solvers.xpbd.kernels 63a706b load on device 'cuda:0' took 25699.59 ms  (compiled)
+  frame    0  tip_z=-0.00140  KE=8.677e-01
+  frame   20  tip_z=-0.15091  KE=1.707e+01
+  frame   40  tip_z=-0.18721  KE=1.998e+00
+  frame   60  tip_z=-0.15754  KE=3.625e+00
+  frame   80  tip_z=-0.12848  KE=3.641e-01
+  frame  100  tip_z=-0.14032  KE=3.734e-01
+  frame  120  tip_z=-0.15553  KE=2.423e-01
+  frame  140  tip_z=-0.15710  KE=5.842e-03
+  frame  160  tip_z=-0.15359  KE=1.363e-02
+  frame  180  tip_z=-0.15027  KE=3.061e-03
+  frame  200  tip_z=-0.15105  KE=7.840e-04
+  frame  220  tip_z=-0.15082  KE=4.314e-05
+  frame  240  tip_z=-0.15071  KE=1.396e-05
+  frame  260  tip_z=-0.15071  KE=1.083e-05
+  frame  280  tip_z=-0.15084  KE=1.230e-05
+  frame  300  tip_z=-0.15086  KE=1.543e-05
+  frame  320  tip_z=-0.15089  KE=1.725e-05
+  frame  340  tip_z=-0.15085  KE=1.701e-05
+  frame  360  tip_z=-0.15085  KE=1.386e-05
+  frame  380  tip_z=-0.15085  KE=1.085e-05
+  frame  400  tip_z=-0.15084  KE=8.822e-06
+  frame  420  tip_z=-0.15084  KE=8.346e-06
+  frame  440  tip_z=-0.15085  KE=9.039e-06
+  frame  460  tip_z=-0.15086  KE=8.839e-06
+  frame  480  tip_z=-0.15086  KE=8.766e-06
+  frame  500  tip_z=-0.15088  KE=7.218e-06
+  frame  520  tip_z=-0.15084  KE=6.099e-06
+  frame  540  tip_z=-0.15085  KE=4.764e-06
+  frame  560  tip_z=-0.15081  KE=4.135e-06
+  frame  580  tip_z=-0.15081  KE=3.646e-06
+[newton] wrote /content/Newton/data/mesh.npz
+[newton] wrote /content/Newton/data/newton_result.npz
+[newton] tip vertical drop = 150.83 mm
+[newton] solve wall time = 89.153 s (solver=xpbd, substeps=32, iters=10)
