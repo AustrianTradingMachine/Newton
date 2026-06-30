@@ -53,8 +53,8 @@ share **identical nodes** — so only the element type and the contact method ch
 |---|---|---|
 | 1 | tet, kn×5, penalty | soft penalty → visible penetration, **plus** tet locking |
 | 2 | tet, kn×50, penalty | stiffer penalty → less penetration, still tet locking |
-| 3 | tet, kn×5, AL | Uzawa drives penetration ≈ 0 at modest kn, still tet locking |
-| 4 | **hex, kn×50, AL** | AL (penetration ≈ 0) on **locking-free hex** → the most accurate |
+| 3 | tet, kn×10, AL | Uzawa drives penetration ≈ 0 at modest kn, still tet locking |
+| 4 | **hex, kn×10, AL** | AL (penetration ≈ 0) on **locking-free hex** → the most accurate (same AL + kn as #3 → isolates the element/locking effect) |
 
 Per step the run records the **total contact force** (∫ p·n_z ds), the strain energy,
 the penalty (contact) energy `½ kn ⟨−g⟩₊²`, and the **max residual penetration**. The

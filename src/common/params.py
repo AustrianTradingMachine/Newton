@@ -160,13 +160,14 @@ INDENT_WITH_GRAVITY = False     # isolate contact for the Hertz comparison
 # tets on the same grid), so only the element type and contact method change:
 #   1. tet kn x5  penalty  -> soft penalty: visible penetration, plus tet locking
 #   2. tet kn x50 penalty  -> stiffer penalty: less penetration, still tet locking
-#   3. tet kn x5  AL       -> Uzawa drives penetration ~0 at modest kn, still tet locking
-#   4. hex kn x50 AL       -> AL (penetration ~0) on locking-free hex: the most accurate
+#   3. tet kn x10 AL       -> Uzawa drives penetration ~0 at modest kn, still tet locking
+#   4. hex kn x10 AL       -> AL (penetration ~0) on locking-free hex: the most accurate
+#   (#3 and #4 share AL + kn x10, so only the element type differs -> isolates locking)
 INDENT_VARIANTS = (
     ("tet", 5.0, "penalty"),
     ("tet", 50.0, "penalty"),
-    ("tet", 5.0, "aug_lagrangian"),
-    ("hex", 50.0, "aug_lagrangian"),
+    ("tet", 10.0, "aug_lagrangian"),
+    ("hex", 10.0, "aug_lagrangian"),
 )
 INDENT_AUG_ITERS = 8            # Uzawa multiplier updates per indentation step
 INDENT_AUG_PEN_TOL = 1.0e-5     # stop Uzawa when max penetration < this [m]
