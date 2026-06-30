@@ -12,6 +12,15 @@ shapes are comparable. The headline difference we want to show is that XPBD has
 projection -- so the meaningful comparison axis is the DEFORMATION / PENETRATION,
 not a contact force (XPBD does not expose one cleanly; the FEM penalty run does).
 
+Solver note (fairness): the flagship hanging bar runs all three Newton solvers
+(XPBD / VBD / SemiImplicit), but this contact scenario runs XPBD only. The rigid sphere
+couples to the soft grid through Newton's rigid-body + soft_contact pipeline (kinematic
+body + model.soft_contact_*), which in this repo is exercised only via XPBD. VBD here is
+wired for deformable elasticity (its contact is particle self-contact, off) and
+SemiImplicit is the explicit/differentiable solver; whether either can drive this
+rigid-contact path is unverified -- TODO[verify-on-colab]. So in the contact scenarios
+"Newton" means XPBD specifically.
+
 Outputs -> data/newton_indentation.npz:
   * deltas                 indentation schedule [m]
   * line_x, uz_line        deformed top-surface dimple at max indentation

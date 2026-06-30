@@ -12,6 +12,21 @@ not.** XPBD enforces non-penetration by positional projection and exposes no
 comparable force, so the honest common axis is the deformation, and the force curve
 is something the fast solver simply cannot provide.
 
+> **A note on fairness.** These contact scenarios run Newton's **XPBD only**, whereas the
+> flagship hanging bar runs all three Newton solvers. The reason is structural: the rigid
+> sphere / ground plane couple to the soft body through Newton's rigid-body `soft_contact`
+> pipeline, which in this repo is exercised only via XPBD (adapted from Newton's
+> `rigid_soft_contact` example). VBD here is wired for deformable elasticity (its contact is
+> particle self-contact) and SemiImplicit is the explicit/differentiable solver; whether
+> either can drive this rigid-contact path is **unverified** (`TODO[verify-on-colab]`). So in
+> the contact scenarios *"Newton" means XPBD specifically* — and the "no calibrated contact
+> force" point is XPBD's limitation, not a general Newton one. Two consequences to read
+> honestly: (i) for the **drop**, the FEM is *implicit* Newmark, whose apples-to-apples Newton
+> match would be the *implicit VBD* — unavailable here, so XPBD-vs-Newmark is not a clean
+> solver-only contrast; (ii) part of any residual gap is **constitutive** (Newton's
+> StVK/co-rotational vs FEM's Neo-Hookean), which grows once strains leave the small-strain
+> regime, so the contact curves are not pure solver error.
+
 ---
 
 ## 1. Indentation — a rigid sphere pressed into a soft slab

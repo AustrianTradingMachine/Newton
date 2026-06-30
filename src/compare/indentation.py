@@ -9,6 +9,11 @@ The key point: the FEM penalty run yields a calibrated contact-force curve
 comparable force -- so here the solvers are compared on DEFORMATION, which is the
 quantity both expose cleanly.
 
+Caveat (fairness): the comparison is XPBD-only (the implicit VBD is not wired for this
+rigid contact; see newton_run/run_indentation), and part of the residual XPBD-vs-FEM
+dimple gap is constitutive (Newton StVK vs FEM Neo-Hookean), growing outside small
+strain -- it is not a pure solver gap.
+
 Run from the repository root (after the indentation FEM and/or Newton have produced npz):
 
     python -m compare.indentation

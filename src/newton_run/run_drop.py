@@ -6,6 +6,15 @@ a soft block rests on the ground and a *free* rigid sphere is dropped onto it
 under gravity. This is the original dynamic-impact case (vs. the indentation
 test's controlled quasi-static indentation).
 
+Solver note (fairness): runs XPBD only. The FEM side is *implicit* Newmark, whose
+apples-to-apples Newton counterpart would be the implicit VBD -- but this scene couples a
+*free* rigid sphere + ground plane to the block through Newton's rigid-body soft_contact
+pipeline, which here only XPBD drives (VBD is deformable-only in this repo; SemiImplicit is
+explicit/differentiable; rigid-contact support for either is unverified --
+TODO[verify-on-colab]). So "Newton" here is XPBD, and the XPBD-vs-Newmark transient is not
+a clean solver-only comparison -- it also mixes material, contact model and time stepping
+(see compare/drop).
+
 Records a time series -> data/newton_drop.npz:
   t, sphere_z, penetration, strain_energy (block), kinetic_energy (block)
   plus rest_q, final_q, tet_indices, sphere_c at the deepest-impact frame (3D scene).

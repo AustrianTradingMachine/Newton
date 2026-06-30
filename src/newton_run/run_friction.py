@@ -14,6 +14,13 @@ normal contact force. So the comparison axis here is the kinematic response:
 The FEM run provides the actual friction force and dissipated work; this run shows
 what XPBD can and cannot give.
 
+Solver note (fairness): XPBD only, like the other contact scenarios. The implicit VBD
+(the apples-to-apples match for the implicit FEM) is not shown because the rigid
+ground-plane + soft_contact Coulomb path used here is, in this repo, an XPBD path; VBD's
+contact is particle self-contact (off in the flagship) and SemiImplicit is the
+explicit/differentiable solver -- rigid-contact support for either is unverified
+(TODO[verify-on-colab]). So "Newton" here means XPBD.
+
 -> data/newton_friction.npz
 
 Run on Colab (CUDA):  python -m newton_run.run_friction

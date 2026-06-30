@@ -79,6 +79,7 @@ versions and have **not** been re-run on the current stack. The marked files:
 | `fenics_run/run_hanging_bar.py` | dolfinx geometry API (`bb_tree` / `compute_collisions_points` / `compute_colliding_cells`) |
 | `fenics_run/run_friction.py` | component Dirichlet via `V.sub(i).collapse()` |
 | `fenics_run/run_drop.py` | dynamic contact: dt / damping tuning, the no-Dirichlet dynamic tangent |
+| contact scenarios (XPBD-only) | whether VBD/SemiImplicit can drive Newton's rigid-body / ground-plane `soft_contact` path (indentation/drop/friction use XPBD only; see CONTACT.md) |
 
 The dynamic **drop** and the **θ\* fit** are the least settled numerically and should
 be treated as work-in-progress until they have a clean Colab run.

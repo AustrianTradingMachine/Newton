@@ -2,8 +2,14 @@
 
 Overlays the transient time series of the literal rigid_soft_contact scenario:
 sphere height, penetration, block strain & kinetic energy (and the FEM contact
-force). This is the dynamic-impact difference between a fast positional solver and
-an implicit FEM elastodynamics + contact solve.
+force). This contrasts Newton's fast positional XPBD against implicit FEM (Newmark)
+elastodynamics + contact. CAVEAT: the transient gap is NOT solver-only -- the two sides
+also differ in material (Newton StVK/co-rotational vs FEM Neo-Hookean), contact model
+(soft_contact penalty + in-solver free rigid body vs analytic-obstacle penalty +
+Kelvin-Voigt + a staggered sphere ODE) and time integration, and the material difference
+grows once impact strains leave the small-strain regime. The implicit VBD (the natural
+counterpart to the implicit Newmark FEM) is unavailable for this rigid free-body scene
+(XPBD-only; see newton_run/run_drop).
 
 History columns:
   Newton: t, sphere_z, penetration, U_strain, KE

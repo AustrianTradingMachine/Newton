@@ -39,6 +39,8 @@ testable.
 
 Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/<x>.py` (the overlay). The analysis lives in the `10/20/30/40_*` notebooks, each written as a **10-minute read for a skeptical expert** (verdict first, then the mechanism), with a rendered 3D scene of what is being simulated.
 
+> **Fairness note.** In the **contact** scenarios (indentation / drop / friction) "Newton" means **XPBD specifically**: VBD/SemiImplicit are not wired for Newton's rigid-body contact path here, so they are not shown (see [docs/CONTACT.md](docs/CONTACT.md)). XPBD's "no calibrated contact force" is an XPBD limitation, not a general Newton one.
+
 ## The three Newton solvers
 
 - **XPBD** — positional projection; fast; leaves a finite equilibrium residual → reads slightly soft. The canonical run (writes the shared mesh).

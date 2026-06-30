@@ -69,6 +69,7 @@ Data flow: `newton_run/run_hanging_bar` produces the **shared mesh** (`data/mesh
 - The diagnostics' correctness claims are **backed by `tests/test_energies.py`** (`pytest tests/` or `python tests/test_energies.py`): nodal forces = −dU/dx via a finite-difference check, and the uniaxial closed form to machine precision. Do not write "validated" for anything not covered there.
 - The θ* differentiable fit runs on **SemiImplicit** and characterises *that* solver vs FEM — **not XPBD**. XPBD's softness is measured by the equilibrium residual / tip ratio.
 - Colab result numbers are **observations** (Python 3.12, dolfinx 0.11.0), recorded with provenance — not eternal "verified" claims. `TODO[verify-on-colab]` marks what still needs a GPU run.
+- The **contact scenarios (indentation/drop/friction) use Newton's XPBD only** — VBD/SemiImplicit are not wired for Newton's rigid-body `soft_contact` path here (unverified → `TODO[verify-on-colab]`). Attribute "no calibrated contact force" to **XPBD**, not Newton generally; the drop's implicit-Newmark FEM has no implicit-Newton (VBD) counterpart shown, so don't present its transient as a clean solver-only gap.
 
 ## Running
 
