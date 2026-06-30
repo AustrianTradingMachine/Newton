@@ -7,7 +7,7 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 
 Same mesh, same material parameters (Lamé μ, λ), same gravity — *only the solver differs* (the FEM side uses a compressible Neo-Hookean law, Newton an StVK/co-rotational one at the same μ, λ — equal at small strain). The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Hanging bar (closed-form *deformation*):** it is the case whose analytic answer is the deformation itself — the 1-D self-weight tip elongation — so every solver is scored node-for-node against it (the other scenarios have analytic anchors too, but for a force or stress, not the whole deformed field). FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits), and the implicit **VBD** is expected to track it; the fast **XPBD** settles softer — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
+> **Hanging bar (closed-form *deformation*):** it is the case whose analytic answer is the deformation itself — the 1-D self-weight tip elongation — so every solver is scored node-for-node against it (the other scenarios have analytic anchors too, but for a force or stress, not the whole deformed field). FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits). The Newton solvers, at this run's budgets, all settle far **softer** — XPBD ≈ 3.7×, VBD ≈ 3.2×, explicit ≈ 2.0× the FEM tip — for two different reasons: XPBD *projects* positions instead of solving the force balance (a finite equilibrium residual it never drives out), while VBD's block Gauss-Seidel has not converged on this slender bar at the iteration budget used. The explicit solver is the closest of the three; VBD does **not** track FEM here. The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
 
 ### The references are layered: analytic → FEM → Newton
 
@@ -43,7 +43,7 @@ Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/
 ## The three Newton solvers
 
 - **XPBD** — positional projection; fast; leaves a finite equilibrium residual → reads slightly soft. The canonical run (writes the shared mesh).
-- **VBD** — Vertex Block Descent; *implicit* (minimises the backward-Euler objective); converges toward the FEM-like solution.
+- **VBD** — Vertex Block Descent; *implicit* (minimises the backward-Euler objective). In principle converges to the implicit solution *as iterations grow*; on the slender hanging bar at the budget used it still settles ~3× too soft (slow block-Gauss-Seidel propagation of the clamp).
 - **SemiImplicit** — explicit, force-based; the *differentiable* one → used by the `diffsim` θ\* fit and the material test.
 
 ## Platform

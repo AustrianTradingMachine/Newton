@@ -108,9 +108,11 @@ Per-step SNES iteration counts and the converged reason are printed.
 
 ## 3. The three Newton solvers
 
-`newton_run/run_hanging_bar.py --solver {xpbd|vbd|semi_implicit}`. All three settle
-the *same* grid to the *same* static equilibrium in principle; they differ in how
-they get there, which is the whole point.
+`newton_run/run_hanging_bar.py --solver {xpbd|vbd|semi_implicit}`. In principle all
+three settle the *same* grid toward the *same* static equilibrium; they differ in how
+they get there — and, at this run's budgets, in how far they actually get. In practice
+none reaches it: the observed tips are XPBD 159 mm, VBD 140 mm, explicit 85 mm against
+FEM 43 mm / analytic 44 mm, for the per-solver reasons below.
 
 | solver | class | kind | budget | writes |
 |---|---|---|---|---|
@@ -126,7 +128,12 @@ they get there, which is the whole point.
 - **VBD** minimises the backward-Euler objective by block coordinate descent over a
   coloured vertex graph (it requires `builder.color()`, which `build_model` runs only
   for this solver). Being implicit, it converges toward the same solution the implicit
-  FEM finds — it is the genuine volumetric soft-body counterpart to XPBD.
+  FEM finds **as the iteration count grows** — but the convergence is slow on a slender
+  bar: block Gauss-Seidel propagates the clamp only ~one node layer per iteration, and
+  this bar is 17 layers tall, so at the 50 iterations used it still settles ~3× too soft
+  (observed tip ≈ 140 mm vs FEM ≈ 43 mm). It is the genuine volumetric soft-body
+  counterpart to XPBD, but reaching the FEM answer needs far more iterations than the
+  fast budget allows.
 - **SemiImplicit** is the explicit, force-based integrator. It is the **one Warp can
   differentiate**, so it is what the θ\* stiffness fit (`diffsim.py`) and the material
   test use. It is not used to claim XPBD's accuracy.

@@ -66,7 +66,7 @@ Data flow: `newton_run/run_hanging_bar` produces the **shared mesh** (`data/mesh
 ## The three Newton solvers (hanging-bar scenario)
 
 - **XPBD** — positional projection; fast; leaves a finite **equilibrium residual** (its settled state is a projection, not a force balance), so it reads slightly soft. The canonical run that writes the shared mesh.
-- **VBD** — Vertex Block Descent; **implicit** (minimises the backward-Euler objective by block coordinate descent over a coloured vertex graph; needs `builder.color()`); converges toward the FEM-like implicit solution.
+- **VBD** — Vertex Block Descent; **implicit** (minimises the backward-Euler objective by block coordinate descent over a coloured vertex graph; needs `builder.color()`). In principle converges toward the FEM-like implicit solution *as iterations grow*, but on the slender hanging bar at the budget used (50 iters) it still settles ~3× too soft — block Gauss-Seidel needs many iterations to propagate the clamp down a 17-layer bar (observed tip ≈ 140 mm vs FEM ≈ 43 mm). The implicit VBD is not the accurate partner here; quantifying the budget needed is the convergence study's job.
 - **SemiImplicit** — explicit, force-based; the **differentiable** one → used by `diffsim.py` (the θ* effective-stiffness fit) and the Newton material test.
 
 ## Honesty rules (keep the repo defensible)
