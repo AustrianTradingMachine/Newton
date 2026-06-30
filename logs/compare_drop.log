@@ -1,8 +1,0 @@
-[drop] wrote /content/Newton/figures/drop_scene.png
-[drop] wrote /content/Newton/figures/drop_sphere_z.png
-[drop] wrote /content/Newton/figures/drop_penetration.png
-[drop] wrote /content/Newton/figures/drop_strain_energy.png
-[drop] wrote /content/Newton/figures/drop_kinetic_energy.png
-[drop] Newton XPBD: min sphere_z=1.027 m, max penetration=0.00 mm, peak strain energy=233.3 J
-[drop] Newton VBD: min sphere_z=0.753 m, max penetration=9.35 mm, peak strain energy=3.569 J
-[drop] Newton explicit: min sphere_z=0.673 m, max penetration=0.00 mm, peak strain energy=7536 J
