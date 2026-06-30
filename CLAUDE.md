@@ -33,6 +33,7 @@ Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capa
 ```
 src/common/params.py                single source of truth
 src/common/mesh_io.py               shared mesh Newton <-> FEM (tet orientation)
+src/common/runlog.py                notebook pipeline-stage runner (live stream + logs/summary.txt)
 src/newton_run/run_hanging_bar.py   three solvers (--solver xpbd|vbd|semi_implicit); writes the shared mesh
 src/newton_run/run_indentation.py   sphere indentation (--solver xpbd|vbd|semi_implicit)
 src/newton_run/run_drop.py          dynamic drop (--solver xpbd|vbd|semi_implicit)

@@ -45,6 +45,7 @@ def _find_repo_root(start: str) -> str:
 REPO_ROOT = os.environ.get("NEWTON_VS_FEM_ROOT") or _find_repo_root(__file__)
 DATA_DIR = os.environ.get("NEWTON_VS_FEM_DATA") or os.path.join(REPO_ROOT, "data")
 FIG_DIR = os.environ.get("NEWTON_VS_FEM_FIGURES") or os.path.join(REPO_ROOT, "figures")
+LOGS_DIR = os.environ.get("NEWTON_VS_FEM_LOGS") or os.path.join(REPO_ROOT, "logs")
 # Shared artefacts written by the Newton run and consumed downstream
 MESH_NPZ = os.path.join(DATA_DIR, "mesh.npz")            # rest mesh + fixed nodes
 NEWTON_NPZ = os.path.join(DATA_DIR, "newton_result.npz")  # XPBD settled state

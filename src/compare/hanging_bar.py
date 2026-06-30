@@ -153,6 +153,68 @@ def plot_settling(newtons):
     print(f"[compare] wrote {out}")
 
 
+def plot_vbd_diagnostic(newtons, fem):
+    """Extra VBD-focused figures (only written if a VBD run is present).
+
+    VBD is the implicit solver that *should* track FEM / the analytic bar most
+    closely; if it instead comes out far off, these two figures isolate why:
+      * its displacement profile against the analytic 1-D bar and FEM tet, and
+      * its settling history (tip height + kinetic energy) -- which shows directly
+        whether the implicit solve converged to a static equilibrium or never
+        settled / diverged (a misconfiguration tell, not solver compliance).
+    """
+    vbd = next((d for label, d, _ in newtons if "VBD" in label), None)
+    if vbd is None:
+        return
+    rest = fem["rest_q"]
+    z_top = rest[fem["fixed_nodes"], 2].mean()
+    za = np.linspace(rest[:, 2].min(), rest[:, 2].max(), 100)
+    ua = params.analytic_hanging_displacement(za, z_top, params.BLOCK_LZ) * 1000.0
+
+    # (1) VBD profile vs analytic + FEM
+    plt.figure(figsize=(6, 5))
+    plt.scatter(vbd["rest_q"][:, 2], -displacement(vbd)[:, 2] * 1000.0, s=10, alpha=0.5,
+                color="tab:red", label="Newton VBD")
+    plt.scatter(fem["rest_q"][:, 2], -displacement(fem)[:, 2] * 1000.0, s=8, alpha=0.3,
+                color="tab:blue", label="FEM tet")
+    plt.plot(za, ua, "k--", lw=1.5, label="analytic 1-D bar")
+    plt.xlabel("original height z  [m]")
+    plt.ylabel("downward displacement  [mm]")
+    plt.title("Hanging bar: VBD vs analytic + FEM")
+    plt.legend()
+    plt.grid(alpha=0.3)
+    out = os.path.join(params.FIG_DIR, "hanging_bar_vbd_vs_analytic.png")
+    plt.tight_layout()
+    plt.savefig(out, dpi=130)
+    plt.close()
+    print(f"[compare] wrote {out}")
+
+    # (2) VBD settling history -- did the implicit solve actually converge / settle?
+    hist = vbd["history"]
+    if hist.size:
+        t, tip_z, ke = hist[:, 0], hist[:, 1], hist[:, 2]
+        fig, ax1 = plt.subplots(figsize=(6, 4))
+        ax1.plot(t, tip_z, color="tab:red")
+        ax1.set_xlabel("time [s]")
+        ax1.set_ylabel("tip height z [m]", color="tab:red")
+        ax2 = ax1.twinx()
+        ax2.semilogy(t, np.maximum(ke, 1e-12), color="tab:green", alpha=0.6)
+        ax2.set_ylabel("kinetic energy [J]", color="tab:green")
+        plt.title("Hanging bar: VBD settling (did it converge?)")
+        out = os.path.join(params.FIG_DIR, "hanging_bar_vbd_settling.png")
+        fig.tight_layout()
+        fig.savefig(out, dpi=130)
+        plt.close(fig)
+        print(f"[compare] wrote {out}")
+
+    # numeric: how far is VBD from the analytic tip?
+    tip_vbd = _tip_drop(vbd)
+    tip_analytic = params.analytic_hanging_displacement(
+        rest[:, 2].min(), z_top, params.BLOCK_LZ) * 1000.0
+    ratio = tip_vbd / tip_analytic if tip_analytic else float("nan")
+    print(f"[compare] VBD tip = {tip_vbd:.2f} mm vs analytic {tip_analytic:.2f} mm (ratio {ratio:.2f})")
+
+
 def plot_error_hist(newtons, fem):
     """Per-node displacement error of each Newton solver vs tet-FEM."""
     free = np.setdiff1d(np.arange(len(fem["rest_q"])), fem["fixed_nodes"])
@@ -177,6 +239,7 @@ def main():
     report(newtons, fem, hexfem)
     plot_profile(newtons, fem, hexfem)
     plot_settling(newtons)
+    plot_vbd_diagnostic(newtons, fem)
     plot_error_hist(newtons, fem)
 
 
