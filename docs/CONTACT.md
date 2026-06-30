@@ -61,8 +61,8 @@ The sphere is analytic: the signed gap `g = ‖(X+u) − c‖ − R` and the sur
   depend on the penalty stiffness `kn`.
 - **aug_lagrangian (Uzawa)** — keep a contact-pressure multiplier field `λ` and use
   `p = ⟨λ − kn·g⟩₊`; after each inner nonlinear solve, update `λ ← p`. Iterating this
-  **outer loop** drives the penetration toward zero at a *modest* `kn`, approaching
-  the exact non-penetration constraint without the ill-conditioning of `kn → ∞`. It
+  **outer loop** drives the penetration toward zero **without** pushing `kn → ∞`,
+  approaching the exact non-penetration constraint without that ill-conditioning. It
   stays in pure UFL — `λ` is an interpolated field, not an extra global unknown, so
   there is **no saddle-point system** (`INDENT_AUG_ITERS = 8`,
   `INDENT_AUG_PEN_TOL = 10⁻⁵ m`).
@@ -77,8 +77,8 @@ share **identical nodes** — so only the element type and the contact method ch
 |---|---|---|
 | 1 | tet, kn×5, penalty | soft penalty → visible penetration, **plus** tet locking |
 | 2 | tet, kn×50, penalty | stiffer penalty → less penetration, still tet locking |
-| 3 | tet, kn×10, AL | Uzawa drives penetration ≈ 0 at modest kn, still tet locking |
-| 4 | **hex, kn×10, AL** | AL (penetration ≈ 0) on **locking-free hex** → the most accurate (same AL + kn as #3 → isolates the element/locking effect) |
+| 3 | tet, kn×50, AL | Uzawa drives penetration ≈ 0 at the **same kn as #2**, still tet locking (#2 vs #3 = penalty vs AL at equal kn) |
+| 4 | **hex, kn×50, AL** | AL (penetration ≈ 0) on **locking-free hex** → the most accurate (same AL + kn as #3 → isolates the element/locking effect) |
 
 Per step the run records the **total contact force** (∫ p·n_z ds), the strain energy,
 the penalty (contact) energy `½ kn ⟨−g⟩₊²`, and the **max residual penetration**. The
