@@ -7,7 +7,7 @@ may be missing) and writes:
   * friction force vs top drag (FEM) with the analytic Coulomb plateau mu*W and
     the normal force N (~ weight) -- the stick-then-slip curve,
   * cumulative frictional work (FEM),
-  * the kinematic response solvers share: mean bottom slip vs top drag (Newton exposes
+  * the kinematic response solvers share: mean bottom slip vs top drag (XPBD exposes
     the slip but no calibrated friction force; the implicit VBD is the apples-to-apples
     counterpart to the implicit FEM).
 

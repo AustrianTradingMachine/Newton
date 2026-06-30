@@ -45,13 +45,15 @@ friction force (rises then plateaus), the normal force `N` (≈ `W`), the mean b
 slip, the slipping-area fraction, and the **cumulative frictional work** dissipated in
 steady slip. → `data/fem_friction.npz`.
 
-### The Newton (XPBD) side (`newton_run/run_friction.py`)
+### The Newton side (`newton_run/run_friction.py`, all three solvers)
 
+`run_friction.py --solver xpbd|vbd|semi_implicit` drags the block on the shared
+ground-contact scene (default XPBD; VBD/SemiImplicit version-gated `TODO[verify-on-colab]`).
 Coulomb friction is set via `soft_contact_mu`, the top face is pinned and dragged.
-As with normal contact, **XPBD exposes no calibrated tangential force** — so the axis
-here is the kinematic response: mean bottom slip vs. top drag (the stick-then-slip
-knee) and the strain energy / residual KE. The FEM run supplies the force and the
-dissipated work that XPBD cannot. `compare/friction.py` overlays them;
+As with normal contact, the fast positional **XPBD exposes no calibrated tangential
+force** — so the axis here is the kinematic response: mean bottom slip vs. top drag (the
+stick-then-slip knee) and the strain energy / residual KE. The FEM run supplies the force
+and the dissipated work that XPBD cannot. `compare/friction.py` overlays them;
 [`40_friction.ipynb`](../40_friction.ipynb) is the walkthrough.
 
 ---
@@ -108,7 +110,7 @@ The study that separates **discretisation error** (FEM) from **solver-budget err
 2. **Load-increment sweep** at the finest mesh (`CONV_FEM_LOADSTEPS = (1, 2, 4, 8)`):
    the *converged* tip drop must be independent of the number of gravity increments
    (they affect only Newton-Raphson robustness / total iterations) — a direct
-   validation that the nonlinear solve is correct.
+   self-consistency check on the nonlinear solve.
 
 Records `h`, #DOFs, tip, strain, wall time per resolution.
 

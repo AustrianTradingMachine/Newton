@@ -151,8 +151,8 @@ def main():
             mu=mu, weight=weight, wall_time=wall_time, solver=args.solver,
         )
         print(f"[friction-newton] wrote {out}")
-        print(f"[friction-newton] note: Newton ({args.solver}) exposes no calibrated friction "
-              "force; see the FEM run for force + dissipated work.")
+        print(f"[friction-newton] note: this Newton ({args.solver}) run records slip / energy "
+              "only, not a calibrated friction force; see the FEM run for force + dissipated work.")
 
 
 if __name__ == "__main__":

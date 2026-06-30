@@ -5,16 +5,17 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 - **NVIDIA Newton** (on Warp, CUDA) — three solvers: **XPBD** (fast positional projection), **VBD** (implicit), **SemiImplicit** (explicit, differentiable);
 - **FEniCSx / dolfinx** — **implicit FEM**, used as the reference solve.
 
-Same mesh, same compressible Neo-Hookean material, same gravity — *only the solver differs*. The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
+Same mesh, same material parameters (Lamé μ, λ), same gravity — *only the solver differs* (the FEM side uses a compressible Neo-Hookean law, Newton an StVK/co-rotational one at the same μ, λ — equal at small strain). The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Hanging bar (the one test with a known answer):** FEM and Newton **VBD** land on the analytic value; **XPBD** settles a few percent soft — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
+> **Hanging bar (the one test with a known answer):** FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits), and the implicit **VBD** is expected to track it; the fast **XPBD** settles softer — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
 
 ### The references are layered: analytic → FEM → Newton
 
 Where a **closed-form solution** exists, it anchors *both* sides — so a skeptic can
 follow the whole trust chain, not just take FEM on faith:
 
-- the **1-D self-weight bar** (hanging bar) — tip elongation `ρgL²/2E`;
+- the **1-D self-weight bar** (hanging bar) — tip elongation `ρgL²/2E` (an
+  *approximate* anchor; it omits Poisson contraction and 3-D effects);
 - the **confined uniaxial Neo-Hookean stress law** (material test) — matched **to
   machine precision** by a test in [`tests/`](tests/test_energies.py);
 - the **Coulomb `μ·W` plateau** and `N = W` (friction);
@@ -70,7 +71,8 @@ Then the other scenarios: `run_indentation`, `run_drop`, `run_friction`, `run_st
 ```
 src/common/params.py        single source of truth (geometry, material, gravity, paths, per-scenario params)
 src/common/mesh_io.py        shared mesh Newton <-> FEM (tet orientation)
-src/newton_run/   run_hanging_bar · run_indentation · run_drop · run_friction · run_stress_strain · convergence · diffsim
+src/common/runlog.py        notebook pipeline-stage runner (live stream + logs/summary.txt)
+src/newton_run/   run_hanging_bar · run_indentation · run_drop · run_friction · run_stress_strain · convergence · diffsim · _solver (shared solver factory)
 src/fenics_run/   run_hanging_bar · run_indentation · run_drop · run_friction · run_stress_strain · convergence
 src/compare/      hanging_bar · indentation · drop · friction · stress_strain · convergence · energies · scene
 tests/        test_energies.py   (finite-difference force check + machine-precision stress check)

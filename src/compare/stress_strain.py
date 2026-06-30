@@ -36,7 +36,7 @@ def main():
     if fem is not None:
         plt.plot(lam, fem["sigma_fem"] / 1e3, "o-", color="tab:blue", label="FEM")
     if nw is not None:
-        plt.plot(lam, nw["sigma_newton"] / 1e3, "s-", color="tab:orange", label="Newton (SemiImplicit)")
+        plt.plot(lam, nw["sigma_newton"] / 1e3, "s-", color="tab:purple", label="Newton (SemiImplicit)")
     plt.axhline(0, color="grey", lw=0.6); plt.axvline(1, color="grey", lw=0.6)
     plt.xlabel("stretch  lambda"); plt.ylabel("axial 1st Piola stress  [kPa]")
     plt.title("Effective stress-strain (confined uniaxial)")

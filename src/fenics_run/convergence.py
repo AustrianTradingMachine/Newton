@@ -11,7 +11,7 @@ Two classic FEM convergence checks on the hanging block:
   2. LOAD-INCREMENT sweep at the finest mesh: vary the number of gravity load
      increments in the Newton-Raphson continuation. The *converged* tip drop must
      be independent of the increment count (it only affects robustness / total
-     Newton iterations) -- a direct validation that the nonlinear solve is correct.
+     Newton iterations) -- a direct self-consistency check on the nonlinear solve.
 
 -> data/fem_convergence.npz
 

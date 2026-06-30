@@ -7,7 +7,7 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 - **NVIDIA Newton** (on Warp, CUDA) — three solvers: **XPBD** (fast positional projection), **VBD** (implicit), **SemiImplicit** (explicit, differentiable);
 - **FEniCSx / dolfinx** — **implicit FEM** (the reference solve).
 
-The goal is to make it **measurable** how far Newton's fast solvers deviate from an accurate FEM solve of the *same* physical problem — same mesh, same compressible Neo-Hookean material, same gravity; only the solver differs — with closed-form analytic solutions as analytic references where they exist.
+The goal is to make it **measurable** how far Newton's fast solvers deviate from an accurate FEM solve of the *same* physical problem — same mesh, same material parameters (Lamé μ/λ; FEM uses a Neo-Hookean law, Newton an StVK/co-rotational one, equal at small strain), same gravity; only the solver differs — with closed-form analytic solutions as analytic references where they exist.
 
 Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capable machine**; the easiest is **Google Colab** (free GPU, A100/high-RAM comfortable). FEniCSx is CPU (installed via fem-on-colab, or conda-forge locally). The repo is public on GitHub so Colab opens it directly.
 
@@ -23,7 +23,7 @@ Everything is Python-driven. Newton needs a CUDA GPU → runs on **any CUDA-capa
   | `indentation` | contact | a rigid sphere is pressed into a soft slab |
   | `drop` | dynamic impact | a sphere is dropped onto a block resting on the ground |
   | `friction` | Coulomb friction | a block is dragged across a rigid floor |
-  | `stress_strain` | material law | confined uniaxial squeeze/stretch, stress vs stretch |
+  | `stress_strain` | material test | confined uniaxial squeeze/stretch, stress vs stretch |
   | `convergence` | error study | does more solver budget / a finer mesh close the gap |
 
   Each scenario has `newton_run/run_<x>.py`, `fenics_run/run_<x>.py` and `compare/<x>.py` (the overlay). `compare/energies.py` is the shared, pure-numpy diagnostics library.
@@ -50,6 +50,7 @@ src/fenics_run/run_stress_strain.py FEM uniaxial material test
 src/fenics_run/convergence.py       FEM h-refinement + load-step sweep
 src/compare/{hanging_bar,indentation,drop,friction,stress_strain,convergence}.py   overlays -> figures/
 src/compare/energies.py             pure-numpy diagnostics (strain energy, nodal forces, residual, Jacobian)
+src/compare/scene.py                3-D scene render of the deformed body (matplotlib, headless-safe)
 tests/test_energies.py          validates the diagnostics (no GPU/FEM needed)
 00_setup.ipynb            install + run the whole pipeline (any CUDA GPU); each stage -> logs/summary.txt (OK/ERR health report)
 10_hanging_bar.ipynb            hanging-bar analysis: XPBD / VBD / explicit vs FEM tet/hex vs analytic

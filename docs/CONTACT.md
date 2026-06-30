@@ -130,7 +130,7 @@ rigid sphere falls onto it under gravity. Geometry (`DROP_*`):
 | block | 0.8 × 0.8 × 0.5 m (`DROP_DIM = 8×8×5`, `DROP_CELL = 0.1`) |
 | sphere | R = 0.25 m, density 500 kg/m³ |
 | drop height | centre starts at z = 1.10 m (≈ 0.35 m free fall) |
-| time stepping | dt = 1×10⁻³ s, 400 steps (0.4 s) |
+| time stepping (FEM) | dt = 1×10⁻³ s, 400 steps (0.4 s); Newton sub-steps the same 0.4 s window |
 
 ### The FEM side (`fenics_run/run_drop.py`)
 

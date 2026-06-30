@@ -89,8 +89,8 @@ is the solver. Two mechanisms enforce that:
   **second, more accurate FEM reference**. It uses the **same** 6×6×16 cell grid and the
   **same** 833 nodes / 2499 DOFs as the tet run (only the cell *type* and split differ),
   so it is the *same fineness* — it just costs more per element (8 Gauss points, denser
-  LU). Its nodes differ in *position* from Newton's, so it is compared via the
-  displacement profile, not node-for-node. → `data/fem_result_hex.npz`
+  LU). It is built independently, so its node *ordering* differs from Newton's and it is
+  compared via the displacement profile, not node-for-node. → `data/fem_result_hex.npz`
 
 Reporting both tells the reader how much of any Newton–FEM gap is *solver* and how
 much is *element choice* — the hex result brackets the tet result from the accurate
@@ -113,7 +113,7 @@ they get there, which is the whole point.
 | solver | class | kind | budget | writes |
 |---|---|---|---|---|
 | **XPBD** | `SolverXPBD` | positional projection (fast) | 32 substeps × 10 iters | `mesh.npz` + `newton_result.npz` |
-| **VBD** | `SolverVBD` | **implicit** (Vertex Block Descent) | 10 substeps × 10 iters | `newton_result_vbd.npz` |
+| **VBD** | `SolverVBD` | **implicit** (Vertex Block Descent) | 10 substeps × 50 iters | `newton_result_vbd.npz` |
 | **SemiImplicit** | `SolverSemiImplicit` | explicit, force-based, **differentiable** | 32 substeps | `newton_result_semi.npz` |
 
 - **XPBD** is the canonical run (it owns the shared mesh). It enforces constraints
