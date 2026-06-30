@@ -1,22 +1,72 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "newton-vs-fem"
 version = "0.1.0"
-description = "Newton (XPBD) vs. FEniCSx (FEM) soft-body comparison"
+description = "Newton (XPBD / VBD / SemiImplicit) vs. FEniCSx (FEM) soft-body comparison"
+readme = "README.md"
 requires-python = ">=3.10"
-# Only the lightweight, pip-installable deps are listed here. The heavy
-# simulators are installed separately (see 00_setup_colab.ipynb / requirements.txt):
-#   - Newton/Warp : pip install "newton[examples]"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "AustrianTradingMachine" }]
+keywords = ["soft-body", "FEM", "XPBD", "VBD", "Neo-Hookean", "Newton", "FEniCSx", "Warp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: POSIX :: Linux",
+]
+# Only the lightweight, pip-installable deps live here. The heavy simulators are
+# installed separately (see 00_setup_colab.ipynb / requirements.txt):
+#   - Newton/Warp : pip install "newton[examples]"   (needs a CUDA GPU)
 #   - FEniCSx     : fem-on-colab installer (or conda-forge fenics-dolfinx)
 dependencies = [
     "numpy",
     "matplotlib",
 ]
 
-# Explicit package list: flat layout has several top-level packages, so we list
-# them rather than relying on auto-discovery (which errors on multiple roots).
+[project.optional-dependencies]
+# Everything CI / pre-commit needs (no GPU, no dolfinx) -- `pip install -e ".[dev]"`.
+dev = [
+    "ruff>=0.5",
+    "pytest>=7",
+    "build>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AustrianTradingMachine/Newton"
+Repository = "https://github.com/AustrianTradingMachine/Newton"
+
+# src/ layout: the packages live under src/ so an uninstalled checkout cannot be
+# imported by accident. The flat package names are preserved (no import churn),
+# so `from common import params` and `python -m newton_run.run_hanging_bar` work
+# unchanged once `pip install -e .` has registered them.
 [tool.setuptools]
+package-dir = { "" = "src" }
 packages = ["common", "newton_run", "fenics_run", "compare"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+# Notebooks are analysis artifacts with legitimate idioms ruff dislikes (a shell
+# install followed by `import dolfinx`, compact `import warp; wp.init()` lines) --
+# lint the library code (src/, tests/) only.
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+# Sensible, low-noise set: real bugs (F, B), pycodestyle (E/W), import order (I),
+# and pyupgrade (UP). E702 is intentionally off -- the plotting code uses compact
+# `plt.xlabel(...); plt.ylabel(...)` statements on purpose.
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E702"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["common", "newton_run", "fenics_run", "compare"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

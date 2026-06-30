@@ -1,0 +1,36 @@
+name: CI
+
+# Lint + test + build on every push/PR. NOTE: GitHub Actions has no CUDA GPU and
+# no fem-on-colab, so it cannot run Newton (Warp) or FEniCSx (dolfinx). CI therefore
+# covers exactly the GPU-free surface: ruff lint, the pure-numpy diagnostic tests
+# (tests/), and that the package builds. The simulation stages are run on Colab
+# (see 00_setup_colab.ipynb).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install (dev extras only -- no Newton/Warp, no dolfinx)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Test (pure-numpy diagnostics; no GPU/FEM needed)
+        run: pytest tests/
+
+      - name: Build (sdist + wheel)
+        run: python -m build

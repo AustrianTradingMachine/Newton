@@ -1,4 +1,4 @@
-# Newton side (GPU on Colab T4; CPU fallback works for tiny cases)
+# Newton side (GPU on Colab A100, high-RAM; CPU fallback works for tiny cases)
 newton[examples]      # pulls warp-lang, usd-core, etc.  (fallback: warp-lang + git+https://github.com/newton-physics/newton.git)
 
 # Analysis / plotting
@@ -7,7 +7,7 @@ matplotlib
 
 # FEM reference side: FEniCSx / dolfinx
 #   dolfinx is NOT a plain pip install on Colab. Use the fem-on-colab installer:
-#     !wget -q https://fem-on-colab.github.io/releases/fenicsx-install-real.sh -O /tmp/fenicsx.sh
+#     !wget -q https://fem-on-colab.github.io/releases/fenicsx-install-release-real.sh -O /tmp/fenicsx.sh
 #     !bash /tmp/fenicsx.sh
 #   Locally, the conda-forge package is the reliable route:
 #     conda install -c conda-forge fenics-dolfinx mpich pyvista

@@ -12,3 +12,5 @@ out/
 # local MCP / tooling config
 .mcp.json
 logs/
+dist/
+.ruff_cache/
