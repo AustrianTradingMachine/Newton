@@ -1,0 +1,42 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[friction-newton] device = cuda:0, solver = vbd
+Module warp._src.coloring 7eb14ba load on device 'cpu' took 2.03 ms  (cached)
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.36 ms  (cached)
+Module newton._src.solvers.vbd.particle_vbd_kernels 9140806 load on device 'cpu' took 0.54 ms  (cached)
+[friction-newton] block 0.80x0.80x0.40 m, W=251.05 N, mu=0.3
+Module newton._src.sim.collide 6396eb6 load on device 'cuda:0' took 1.08 ms  (cached)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.09 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.59 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 2.95 ms  (cached)
+Module newton._src.geometry.kernels 18b231c load on device 'cuda:0' took 3.62 ms  (cached)
+Module newton._src.solvers.vbd.rigid_vbd_kernels e8eab16 load on device 'cuda:0' took 5.53 ms  (cached)
+Module newton._src.solvers.vbd.particle_vbd_kernels 776e1a0 load on device 'cuda:0' took 3.12 ms  (cached)
+[friction-newton] drag= 0.00 mm  bottom_slip= 0.00 mm  U=0.5782 J  KE=6.36e-05 J
+[friction-newton] drag= 1.00 mm  bottom_slip= 0.09 mm  U=0.8354 J  KE=1.48e-05 J
+[friction-newton] drag= 2.00 mm  bottom_slip= 0.26 mm  U=0.9705 J  KE=1.10e-05 J
+[friction-newton] drag= 3.00 mm  bottom_slip= 0.51 mm  U=1.055 J  KE=1.24e-05 J
+[friction-newton] drag= 4.00 mm  bottom_slip= 0.84 mm  U=1.117 J  KE=1.50e-05 J
+[friction-newton] drag= 5.00 mm  bottom_slip= 1.23 mm  U=1.168 J  KE=1.77e-05 J
+[friction-newton] drag= 6.00 mm  bottom_slip= 1.69 mm  U=1.212 J  KE=2.09e-05 J
+[friction-newton] drag= 7.00 mm  bottom_slip= 2.19 mm  U=1.252 J  KE=2.29e-05 J
+[friction-newton] drag= 8.00 mm  bottom_slip= 2.75 mm  U=1.29 J  KE=2.58e-05 J
+[friction-newton] drag= 9.00 mm  bottom_slip= 3.35 mm  U=1.325 J  KE=2.76e-05 J
+[friction-newton] drag=10.00 mm  bottom_slip= 3.99 mm  U=1.357 J  KE=2.92e-05 J
+[friction-newton] drag=11.00 mm  bottom_slip= 4.67 mm  U=1.387 J  KE=3.10e-05 J
+[friction-newton] drag=12.00 mm  bottom_slip= 5.39 mm  U=1.415 J  KE=3.25e-05 J
+[friction-newton] drag=13.00 mm  bottom_slip= 6.13 mm  U=1.441 J  KE=3.44e-05 J
+[friction-newton] drag=14.00 mm  bottom_slip= 6.90 mm  U=1.465 J  KE=3.58e-05 J
+[friction-newton] drag=15.00 mm  bottom_slip= 7.69 mm  U=1.486 J  KE=3.67e-05 J
+[friction-newton] drag=16.00 mm  bottom_slip= 8.51 mm  U=1.506 J  KE=3.85e-05 J
+[friction-newton] drag=17.00 mm  bottom_slip= 9.34 mm  U=1.524 J  KE=4.04e-05 J
+[friction-newton] drag=18.00 mm  bottom_slip=10.19 mm  U=1.54 J  KE=4.08e-05 J
+[friction-newton] drag=19.00 mm  bottom_slip=11.06 mm  U=1.555 J  KE=4.15e-05 J
+[friction-newton] drag=20.00 mm  bottom_slip=11.94 mm  U=1.568 J  KE=4.21e-05 J
+[friction-newton] wrote /content/Newton/data/newton_friction_vbd.npz
+[friction-newton] note: this Newton (vbd) run records slip / energy only, not a calibrated friction force; see the FEM run for force + dissipated work.

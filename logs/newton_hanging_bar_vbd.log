@@ -1,0 +1,42 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[newton] device = cuda:0, solver = vbd
+Block            : 0.60 x 0.60 x 1.60 m (6x6x16 cells)
+Density          : 100.0 kg/m^3
+Lame (mu, lambda): 1.000e+04, 5.000e+04 Pa
+-> Young's E, nu : 2.833e+04 Pa, 0.4167
+Gravity          : 9.80665 m/s^2 (-z)
+Analytic tip elongation (1-D bar): 44.30 mm
+
+Module warp._src.coloring 7eb14ba load on device 'cpu' took 4109.64 ms  (compiled)
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.42 ms  (cached)
+[newton] nodes=833 tets=2880 fixed=49 tip_node=24
+Module newton._src.solvers.vbd.particle_vbd_kernels 9140806 load on device 'cpu' took 3681.98 ms  (compiled)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.33 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.28 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 2.97 ms  (cached)
+Module newton._src.solvers.vbd.particle_vbd_kernels 776e1a0 load on device 'cuda:0' took 6937.55 ms  (compiled)
+  frame    0  tip_z=-0.00131  KE=3.440e-01
+  frame   20  tip_z=-0.06075  KE=3.685e-01
+  frame   40  tip_z=-0.09482  KE=1.150e-01
+  frame   60  tip_z=-0.11377  KE=3.668e-02
+  frame   80  tip_z=-0.12444  KE=1.201e-02
+  frame  100  tip_z=-0.13054  KE=4.049e-03
+  frame  120  tip_z=-0.13408  KE=1.412e-03
+  frame  140  tip_z=-0.13618  KE=5.097e-04
+  frame  160  tip_z=-0.13745  KE=1.918e-04
+  frame  180  tip_z=-0.13823  KE=7.473e-05
+  frame  200  tip_z=-0.13873  KE=3.054e-05
+  frame  220  tip_z=-0.13905  KE=1.307e-05
+  frame  240  tip_z=-0.13926  KE=5.627e-06
+  frame  260  tip_z=-0.13941  KE=2.491e-06
+  frame  280  tip_z=-0.13951  KE=1.205e-06
+[newton] settled at frame 286 (KE=9.751e-07)
+[newton] wrote /content/Newton/data/newton_result_vbd.npz
+[newton] tip vertical drop = 139.53 mm
+[newton] solve wall time = 76.269 s (solver=vbd, substeps=10, iters=50)

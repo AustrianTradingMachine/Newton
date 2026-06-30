@@ -1,0 +1,7 @@
+[friction] wrote /content/Newton/figures/friction_force.png
+[friction] wrote /content/Newton/figures/friction_work.png
+[friction] wrote /content/Newton/figures/friction_slip.png
+[friction] FEM peak friction force = 74.97 N vs analytic mu*W = 75.32 N (N = 250.69 N vs W = 251.05 N)
+[friction] Newton XPBD: bottom slip reported; no calibrated friction force (by design).
+[friction] Newton VBD: bottom slip reported; no calibrated friction force (by design).
+[friction] Newton explicit: bottom slip reported; no calibrated friction force (by design).

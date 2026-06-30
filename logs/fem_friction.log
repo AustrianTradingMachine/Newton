@@ -1,0 +1,24 @@
+[friction-fem] block 0.80x0.80x0.40 m, W=251.05 N, mu=0.3, kn=5.67e+06 kt=5.67e+06 Pa/m, plateau mu*W=75.32 N
+[friction-fem] drag= 0.00 mm  F=   0.00 N  N= 251.05 N  slip=-0.00 mm  slipfrac=0.72  W_fric=0 J
+[friction-fem] drag= 1.00 mm  F=  10.79 N  N= 251.05 N  slip= 0.05 mm  slipfrac=0.74  W_fric=0.000486 J
+[friction-fem] drag= 2.00 mm  F=  21.54 N  N= 251.05 N  slip= 0.09 mm  slipfrac=0.77  W_fric=0.00154 J
+[friction-fem] drag= 3.00 mm  F=  32.14 N  N= 251.05 N  slip= 0.15 mm  slipfrac=0.79  W_fric=0.0034 J
+[friction-fem] drag= 4.00 mm  F=  42.66 N  N= 251.05 N  slip= 0.22 mm  slipfrac=0.81  W_fric=0.00642 J
+[friction-fem] drag= 5.00 mm  F=  52.81 N  N= 250.96 N  slip= 0.32 mm  slipfrac=0.87  W_fric=0.0118 J
+[friction-fem] drag= 6.00 mm  F=  61.89 N  N= 251.16 N  slip= 0.49 mm  slipfrac=0.95  W_fric=0.022 J
+[friction-fem] drag= 7.00 mm  F=  68.27 N  N= 251.02 N  slip= 0.87 mm  slipfrac=1.00  W_fric=0.0477 J
+[friction-fem] drag= 8.00 mm  F=  70.78 N  N= 250.82 N  slip= 1.63 mm  slipfrac=1.00  W_fric=0.102 J
+[friction-fem] drag= 9.00 mm  F=  72.17 N  N= 250.74 N  slip= 2.49 mm  slipfrac=1.00  W_fric=0.164 J
+[friction-fem] drag=10.00 mm  F=  73.02 N  N= 250.69 N  slip= 3.40 mm  slipfrac=1.00  W_fric=0.231 J
+[friction-fem] drag=11.00 mm  F=  73.58 N  N= 250.67 N  slip= 4.34 mm  slipfrac=1.00  W_fric=0.3 J
+[friction-fem] drag=12.00 mm  F=  73.96 N  N= 250.66 N  slip= 5.30 mm  slipfrac=1.00  W_fric=0.371 J
+[friction-fem] drag=13.00 mm  F=  74.23 N  N= 250.66 N  slip= 6.27 mm  slipfrac=1.00  W_fric=0.443 J
+[friction-fem] drag=14.00 mm  F=  74.43 N  N= 250.66 N  slip= 7.25 mm  slipfrac=1.00  W_fric=0.515 J
+[friction-fem] drag=15.00 mm  F=  74.58 N  N= 250.67 N  slip= 8.23 mm  slipfrac=1.00  W_fric=0.589 J
+[friction-fem] drag=16.00 mm  F=  74.70 N  N= 250.67 N  slip= 9.22 mm  slipfrac=1.00  W_fric=0.662 J
+[friction-fem] drag=17.00 mm  F=  74.79 N  N= 250.68 N  slip=10.21 mm  slipfrac=1.00  W_fric=0.736 J
+[friction-fem] drag=18.00 mm  F=  74.86 N  N= 250.68 N  slip=11.20 mm  slipfrac=1.00  W_fric=0.81 J
+[friction-fem] drag=19.00 mm  F=  74.92 N  N= 250.68 N  slip=12.19 mm  slipfrac=1.00  W_fric=0.885 J
+[friction-fem] drag=20.00 mm  F=  74.97 N  N= 250.69 N  slip=13.18 mm  slipfrac=1.00  W_fric=0.959 J
+[friction-fem] wrote /content/Newton/data/fem_friction.npz
+[friction-fem] final F=74.97 N vs analytic plateau mu*W=75.32 N (N=250.69 N vs W=251.05 N)
