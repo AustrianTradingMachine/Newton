@@ -1,0 +1,26 @@
+Warp 1.14.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA A100-SXM4-80GB" (79 GiB, sm_80, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.14.0
+[conv-newton] device = cuda:0
+Module newton._src.geometry.bvh 9db2945 load on device 'cuda:0' took 1.38 ms  (cached)
+Module narrow_phase_primitive_write_contact 51d816f load on device 'cuda:0' took 1.19 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 10a247d load on device 'cuda:0' took 2.66 ms  (cached)
+Module newton._src.geometry.narrow_phase 50781fa load on device 'cuda:0' took 2.88 ms  (cached)
+Module newton._src.solvers.solver c4f5217 load on device 'cuda:0' took 1.05 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 63a706b load on device 'cuda:0' took 12.53 ms  (cached)
+[conv-newton] iters=  1 (substeps=32): tip=361.84 mm  U=446.2 J  res_rms=31.18 N  t=20.41 s
+[conv-newton] iters=  2 (substeps=32): tip=282.66 mm  U=272.8 J  res_rms=22.45 N  t=23.67 s
+[conv-newton] iters=  4 (substeps=32): tip=221.21 mm  U=167.9 J  res_rms=16.49 N  t=30.12 s
+[conv-newton] iters=  8 (substeps=32): tip=173.27 mm  U=102.7 J  res_rms=12.22 N  t=43.12 s
+[conv-newton] iters= 16 (substeps=32): tip=134.24 mm  U=62.46 J  res_rms=9.166 N  t=68.03 s
+[conv-newton] iters= 32 (substeps=32): tip=105.73 mm  U=38.61 J  res_rms=7.01 N  t=118.75 s
+[conv-newton] substeps=  4 (iters=10): tip=145.54 mm  U=3.299e+06 J  res_rms=4.429e+04 N  t=9.69 s
+[conv-newton] substeps=  8 (iters=10): tip=168.50 mm  U=98.32 J  res_rms=12.01 N  t=8.69 s
+[conv-newton] substeps= 16 (iters=10): tip=160.91 mm  U=89.54 J  res_rms=11.3 N  t=24.70 s
+[conv-newton] substeps= 32 (iters=10): tip=159.26 mm  U=87.48 J  res_rms=11.14 N  t=49.67 s
+[conv-newton] substeps= 64 (iters=10): tip=163.84 mm  U=92.62 J  res_rms=11.52 N  t=94.30 s
+[conv-newton] wrote /content/Newton/data/newton_convergence.npz

@@ -1,0 +1,97 @@
+[indent-fem] dolfinx 0.11.0.post0, variants=(('tet', 5.0, 'penalty'), ('tet', 50.0, 'penalty'), ('tet', 50.0, 'aug_lagrangian'), ('hex', 50.0, 'aug_lagrangian'))
+[indent-fem:tet kn x5 penalty] slab 1.00x1.00x0.40 m, R=0.3 m, kn=2.83e+06 Pa/m, 20 steps, n_aug=1
+[indent-fem:tet kn x5 penalty] delta=  2.00 mm  F=3.033 N  pen=0.753 mm
+[indent-fem:tet kn x5 penalty] delta=  4.00 mm  F=8.417 N  pen=0.936 mm
+[indent-fem:tet kn x5 penalty] delta=  6.00 mm  F=16.04 N  pen=0.961 mm
+[indent-fem:tet kn x5 penalty] delta=  8.00 mm  F=24.33 N  pen=0.963 mm
+[indent-fem:tet kn x5 penalty] delta= 10.00 mm  F=33.78 N  pen=0.960 mm
+[indent-fem:tet kn x5 penalty] delta= 12.00 mm  F=44.19 N  pen=0.973 mm
+[indent-fem:tet kn x5 penalty] delta= 14.00 mm  F=55.2 N  pen=1.000 mm
+[indent-fem:tet kn x5 penalty] delta= 16.00 mm  F=67.23 N  pen=1.048 mm
+[indent-fem:tet kn x5 penalty] delta= 18.00 mm  F=80.14 N  pen=1.137 mm
+[indent-fem:tet kn x5 penalty] delta= 20.00 mm  F=93.64 N  pen=1.280 mm
+[indent-fem:tet kn x5 penalty] delta= 22.00 mm  F=108.3 N  pen=1.399 mm
+[indent-fem:tet kn x5 penalty] delta= 24.00 mm  F=123.9 N  pen=1.493 mm
+[indent-fem:tet kn x5 penalty] delta= 26.00 mm  F=140.7 N  pen=1.576 mm
+[indent-fem:tet kn x5 penalty] delta= 28.00 mm  F=158.1 N  pen=1.651 mm
+[indent-fem:tet kn x5 penalty] delta= 30.00 mm  F=176.5 N  pen=1.724 mm
+[indent-fem:tet kn x5 penalty] delta= 32.00 mm  F=196.2 N  pen=1.866 mm
+[indent-fem:tet kn x5 penalty] delta= 34.00 mm  F=216.4 N  pen=1.992 mm
+[indent-fem:tet kn x5 penalty] delta= 36.00 mm  F=236.8 N  pen=2.109 mm
+[indent-fem:tet kn x5 penalty] delta= 38.00 mm  F=257.7 N  pen=2.219 mm
+[indent-fem:tet kn x5 penalty] delta= 40.00 mm  F=279.4 N  pen=2.297 mm
+[indent-fem:tet kn x5 penalty] done: 20 steps in 132.91 s (6646 ms/step)  F_max=279.4 N  max_pen=2.297 mm
+[indent-fem:tet kn x50 penalty] slab 1.00x1.00x0.40 m, R=0.3 m, kn=2.83e+07 Pa/m, 20 steps, n_aug=1
+[indent-fem:tet kn x50 penalty] delta=  2.00 mm  F=4.373 N  pen=0.091 mm
+[indent-fem:tet kn x50 penalty] delta=  4.00 mm  F=11.37 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta=  6.00 mm  F=20.77 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta=  8.00 mm  F=28.93 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 10.00 mm  F=41.07 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 12.00 mm  F=53.99 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 14.00 mm  F=65.94 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 16.00 mm  F=78.49 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 18.00 mm  F=91.69 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 20.00 mm  F=105.8 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 22.00 mm  F=120.4 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 24.00 mm  F=137.4 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 26.00 mm  F=153.9 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 28.00 mm  F=171.3 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 30.00 mm  F=192.8 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 32.00 mm  F=217.1 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 34.00 mm  F=239.5 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 36.00 mm  F=262.2 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 38.00 mm  F=285 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] delta= 40.00 mm  F=309.1 N  pen=0.000 mm
+[indent-fem:tet kn x50 penalty] done: 20 steps in 204.20 s (10210 ms/step)  F_max=309.1 N  max_pen=0.000 mm
+[indent-fem:tet kn x50 AL] slab 1.00x1.00x0.40 m, R=0.3 m, kn=2.83e+07 Pa/m, 20 steps, n_aug=8
+[indent-fem:tet kn x50 AL] delta=  2.00 mm  aug=3  F=4.628 N  pen=0.003 mm
+[indent-fem:tet kn x50 AL] delta=  4.00 mm  aug=1  F=7.786 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta=  6.00 mm  aug=1  F=20.77 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta=  8.00 mm  aug=1  F=28.93 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 10.00 mm  aug=1  F=41.07 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 12.00 mm  aug=1  F=53.99 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 14.00 mm  aug=1  F=65.94 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 16.00 mm  aug=1  F=78.49 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 18.00 mm  aug=1  F=91.69 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 20.00 mm  aug=1  F=105.8 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 22.00 mm  aug=1  F=120.4 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 24.00 mm  aug=1  F=137.4 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 26.00 mm  aug=1  F=153.9 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 28.00 mm  aug=1  F=171.3 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 30.00 mm  aug=1  F=192.8 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 32.00 mm  aug=1  F=217.1 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 34.00 mm  aug=1  F=239.5 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 36.00 mm  aug=1  F=262.2 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 38.00 mm  aug=1  F=285 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] delta= 40.00 mm  aug=1  F=309.1 N  pen=0.000 mm
+[indent-fem:tet kn x50 AL] done: 20 steps in 229.05 s (11452 ms/step)  F_max=309.1 N  max_pen=0.000 mm
+[indent-fem:hex kn x50 AL] slab 1.00x1.00x0.40 m, R=0.3 m, kn=2.83e+07 Pa/m, 20 steps, n_aug=8
+[indent-fem:hex kn x50 AL] delta=  2.00 mm  aug=1  F=3.287 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta=  4.00 mm  aug=1  F=9.35 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta=  6.00 mm  aug=1  F=17.63 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta=  8.00 mm  aug=1  F=25.38 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 10.00 mm  aug=1  F=36.06 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 12.00 mm  aug=1  F=46.36 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 14.00 mm  aug=1  F=56.64 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 16.00 mm  aug=1  F=68.15 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 18.00 mm  aug=1  F=79.26 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 20.00 mm  aug=1  F=91.64 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 22.00 mm  aug=1  F=106.3 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 24.00 mm  aug=1  F=123.2 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 26.00 mm  aug=1  F=142.6 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 28.00 mm  aug=1  F=160.2 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 30.00 mm  aug=1  F=179.8 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 32.00 mm  aug=1  F=199.2 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 34.00 mm  aug=1  F=218.8 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 36.00 mm  aug=1  F=240.4 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 38.00 mm  aug=1  F=260.4 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] delta= 40.00 mm  aug=1  F=283.1 N  pen=0.000 mm
+[indent-fem:hex kn x50 AL] done: 20 steps in 3098.38 s (154919 ms/step)  F_max=283.1 N  max_pen=0.000 mm
+[indent-fem] wrote /content/Newton/data/fem_indentation.npz
+[indent-fem] tet kn x5 penalty: F=279.4 N (Hertz ratio 1.395)  max_pen=2.297 mm  wall=132.91 s
+[indent-fem] tet kn x50 penalty: F=309.1 N (Hertz ratio 1.543)  max_pen=0.000 mm  wall=204.20 s
+[indent-fem] tet kn x50 AL: F=309.1 N (Hertz ratio 1.543)  max_pen=0.000 mm  wall=229.05 s
+[indent-fem] hex kn x50 AL: F=283.1 N (Hertz ratio 1.413)  max_pen=0.000 mm  wall=3098.38 s
+[indent-fem] wrote /content/Newton/figures/indentation_force.png
+[indent-fem] wrote /content/Newton/figures/indentation_penetration.png
+[indent-fem] wrote /content/Newton/figures/indentation_profile.png

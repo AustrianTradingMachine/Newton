@@ -1,0 +1,21 @@
+============== Hanging bar: Newton solvers vs FEniCSx (FEM) ==============
+Block            : 0.60 x 0.60 x 1.60 m (6x6x16 cells)
+Density          : 100.0 kg/m^3
+Lame (mu, lambda): 1.000e+04, 5.000e+04 Pa
+-> Young's E, nu : 2.833e+04 Pa, 0.4167
+Gravity          : 9.80665 m/s^2 (-z)
+Analytic tip elongation (1-D bar): 44.30 mm
+------------------------------------------------------------------------
+Tip vertical displacement (downward) [mm]:
+    Newton XPBD     :   159.01
+    Newton VBD      :   139.53
+    Newton explicit :    84.99
+    FEM tet         :    43.20   (node-for-node reference)
+    FEM hex         :    43.40   (independent mesh)
+    analytic 1-D    :    44.30   (self-weight bar)
+------------------------------------------------------------------------
+Node-for-node error vs FEM(tet):   RMS / max [mm]   mean rel [%]   tip ratio
+    Newton XPBD     :  67.459 / 117.927       177.88       3.681
+    Newton VBD      :  70.531 /  97.172       216.27       3.230
+    Newton explicit :  29.390 /  43.064        90.71       1.967
+========================================================================

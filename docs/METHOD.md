@@ -9,9 +9,11 @@ single source of truth both sides import.
 ## 1. The problem: a soft bar hanging under its own weight
 
 A soft block is **clamped on its top face** (max-z) and hangs downward; gravity
-(−z) stretches it. We deliberately picked this case because it is the
-one configuration with a **closed-form reference**, so every solver can be scored
-against an answer rather than only against each other.
+(−z) stretches it. We start with this case because its **closed-form *deformation***
+(the 1-D self-weight bar) scores every solver against an answer for the displacement
+field itself, not only against each other. (The other scenarios carry analytic anchors
+too — Hertz, the Coulomb `μ·W` plateau, the Neo-Hookean stress law — but for a force or
+stress, not the whole deformed body.)
 
 | quantity | symbol | value | source |
 |---|---|---|---|

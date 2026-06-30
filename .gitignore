@@ -5,12 +5,10 @@ __pycache__/
 .DS_Store
 *.egg-info/
 build/
-# generated simulation artefacts (produced by the runs, not source)
-data/
-figures/
+# scratch output (not source); data/, figures/, logs/ are intentionally tracked
+# so third parties can inspect the recorded Colab results without a GPU run.
 out/
 # local MCP / tooling config
 .mcp.json
-logs/
 dist/
 .ruff_cache/

@@ -28,7 +28,7 @@ def main():
     import ufl
     from dolfinx import default_scalar_type, fem
     from dolfinx.fem.petsc import NonlinearProblem
-    from dolfinx.mesh import CellType, create_box, exterior_facet_indices, locate_dofs_topological
+    from dolfinx.mesh import CellType, create_box, exterior_facet_indices
     from mpi4py import MPI
 
     comm = MPI.COMM_WORLD
@@ -47,7 +47,9 @@ def main():
     fdim = msh.topology.dim - 1
     msh.topology.create_connectivity(fdim, msh.topology.dim)
     bfacets = exterior_facet_indices(msh.topology)
-    bdofs = locate_dofs_topological(V, fdim, bfacets)
+    # locate_dofs_topological is in dolfinx.fem, NOT dolfinx.mesh, in dolfinx 0.11 -- importing
+    # it from .mesh (as before) raised ImportError and aborted the entire stress-strain FEM run.
+    bdofs = fem.locate_dofs_topological(V, fdim, bfacets)
     u_bc = fem.Function(V)
     bc = fem.dirichletbc(u_bc, bdofs)
 

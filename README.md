@@ -7,7 +7,7 @@ A quantitative, apples-to-apples comparison of one **deformable soft body** simu
 
 Same mesh, same material parameters (Lamé μ, λ), same gravity — *only the solver differs* (the FEM side uses a compressible Neo-Hookean law, Newton an StVK/co-rotational one at the same μ, λ — equal at small strain). The goal is to make it **measurable** how far the fast game/robotics solver deviates from an accurate FEM solve, and exactly *why*.
 
-> **Hanging bar (the one test with a known answer):** FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits), and the implicit **VBD** is expected to track it; the fast **XPBD** settles softer — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
+> **Hanging bar (closed-form *deformation*):** it is the case whose analytic answer is the deformation itself — the 1-D self-weight tip elongation — so every solver is scored node-for-node against it (the other scenarios have analytic anchors too, but for a force or stress, not the whole deformed field). FEM lands within a few percent of the analytic value (the residual is the 3-D/Poisson correction the 1-D bar omits), and the implicit **VBD** is expected to track it; the fast **XPBD** settles softer — because it *projects* positions rather than *solving* the force balance (it leaves a finite equilibrium residual). The numbers and their provenance are in **[docs/STATUS.md](docs/STATUS.md)**.
 
 ### The references are layered: analytic → FEM → Newton
 
@@ -31,7 +31,7 @@ testable.
 
 | scenario | what it does | the point |
 |---|---|---|
-| **hanging bar** | a soft bar stretches under self-weight | the only case with a *closed-form* (analytic) reference → score every solver against it, with the FEM solve as the reference |
+| **hanging bar** | a soft bar stretches under self-weight | a closed-form *deformation* (1-D tip elongation) to score every solver against node-for-node — with the FEM solve as the reference |
 | **indentation** | a rigid sphere is pressed into a soft slab | FEM gives a calibrated contact-force curve; the fast XPBD gives deformation, not a force (VBD/explicit selectable via `--solver`) |
 | **drop** | a sphere is dropped onto a block (dynamic impact) | transient impact; FEM Newmark + contact vs. Newton solvers (implicit VBD is the natural match; see [docs/CONTACT.md](docs/CONTACT.md)) |
 | **friction** | a block is dragged on a rigid floor | FEM friction force + dissipated work vs. analytic `μ·W`; XPBD slip only |
@@ -76,7 +76,7 @@ src/newton_run/   run_hanging_bar · run_indentation · run_drop · run_friction
 src/fenics_run/   run_hanging_bar · run_indentation · run_drop · run_friction · run_stress_strain · convergence
 src/compare/      hanging_bar · indentation · drop · friction · stress_strain · convergence · energies · scene
 tests/        test_energies.py   (finite-difference force check + machine-precision stress check)
-10_hanging_bar · 20_contact · 25_dynamic · 30_convergence · 40_friction   (analysis notebooks)
+10_hanging_bar · 15_material · 20_contact · 25_dynamic · 30_convergence · 40_friction   (analysis notebooks)
 00_setup.ipynb     install + run the whole pipeline (any CUDA GPU; Colab = easy path)
 ```
 

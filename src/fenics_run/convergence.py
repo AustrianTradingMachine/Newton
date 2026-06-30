@@ -59,7 +59,10 @@ def _tip_drop(u, msh):
     """Downward displacement at the bottom-centre tip point [mm]."""
     ox, oy, oz = params.ORIGIN
     pt = np.array([[ox + params.BLOCK_LX / 2.0, oy + params.BLOCK_LY / 2.0, oz]])
-    uz = float(np.asarray(evaluate_at_nodes(u, msh, pt))[0, 2])
+    # u.eval returns a flat (3,) array for a single point (multi-point eval is 2-D);
+    # reshape to (-1, 3) so the [0, 2] index works for either -- the previous [0, 2]
+    # on the 1-D array raised IndexError and aborted the FEM convergence sweep.
+    uz = float(np.asarray(evaluate_at_nodes(u, msh, pt)).reshape(-1, 3)[0, 2])
     return -uz * 1000.0
 
 

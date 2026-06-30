@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/content/Newton/src/fenics_run/run_stress_strain.py", line 93, in <module>
+    main()
+  File "/content/Newton/src/fenics_run/run_stress_strain.py", line 31, in main
+    from dolfinx.mesh import CellType, create_box, exterior_facet_indices, locate_dofs_topological
+ImportError: cannot import name 'locate_dofs_topological' from 'dolfinx.mesh' (/usr/local/lib/python3.12/dist-packages/dolfinx/mesh.py)

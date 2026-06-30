@@ -1,0 +1,18 @@
+[conv-fem] dolfinx 0.11.0.post0, element=hex
+[fem] load step 1/5: snes_its=3 reason=2
+[fem] load step 2/5: snes_its=3 reason=2
+[fem] load step 3/5: snes_its=3 reason=2
+[fem] load step 4/5: snes_its=3 reason=2
+[fem] load step 5/5: snes_its=3 reason=2
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/content/Newton/src/fenics_run/convergence.py", line 125, in <module>
+    main()
+  File "/content/Newton/src/fenics_run/convergence.py", line 87, in main
+    tip = _tip_drop(u, msh)
+          ^^^^^^^^^^^^^^^^^
+  File "/content/Newton/src/fenics_run/convergence.py", line 62, in _tip_drop
+    uz = float(np.asarray(evaluate_at_nodes(u, msh, pt))[0, 2])
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+IndexError: too many indices for array: array is 1-dimensional, but 2 were indexed
