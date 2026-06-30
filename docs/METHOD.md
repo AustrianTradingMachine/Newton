@@ -75,15 +75,22 @@ is the solver. Two mechanisms enforce that:
 
 `fenics_run/run_hanging_bar.py --element {tet|hex}`:
 
-- **tet** (default) — built from Newton's shared mesh, linear (P1) tetrahedra,
-  node-for-node with Newton. Linear tets are known to be **over-stiff in bending
-  and near-incompressibility (locking)**, so this is the honest like-for-like
-  element, not the most accurate one. → `data/fem_result.npz`
+- **tet** (default) — built from Newton's shared mesh, **genuine simplex** linear
+  (P1) tetrahedra (`basix` `Lagrange`/`tetrahedron`/1, full Galerkin quadrature),
+  node-for-node with Newton. These are *real* 4-node constant-strain simplices — **not**
+  the collapsed/degenerate-hexahedron tets with reduced integration + hourglass control
+  that explicit codes (e.g. LS-DYNA) often use for "tets". Real P1 simplex tets are known
+  to be **over-stiff in bending and near-incompressibility (locking)** because a
+  constant-strain element is too poor to represent those modes, so this is the honest
+  like-for-like element, not the most accurate one. → `data/fem_result.npz`
 - **hex** — an *independent* structured hexahedral mesh of the same block geometry
-  (`create_box`, trilinear Hex8). Hex8 is far less prone to shear/volumetric
-  locking, so it is a **second, more accurate FEM reference**. Its nodes differ from
-  Newton's, so it is compared via the displacement profile, not node-for-node.
-  → `data/fem_result_hex.npz`
+  (`create_box`, trilinear Hex8, full 2×2×2 integration — no reduced-integration
+  hourglass modes). Hex8 is far less prone to shear/volumetric locking, so it is a
+  **second, more accurate FEM reference**. It uses the **same** 6×6×16 cell grid and the
+  **same** 833 nodes / 2499 DOFs as the tet run (only the cell *type* and split differ),
+  so it is the *same fineness* — it just costs more per element (8 Gauss points, denser
+  LU). Its nodes differ in *position* from Newton's, so it is compared via the
+  displacement profile, not node-for-node. → `data/fem_result_hex.npz`
 
 Reporting both tells the reader how much of any Newton–FEM gap is *solver* and how
 much is *element choice* — the hex result brackets the tet result from the accurate
