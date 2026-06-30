@@ -15,8 +15,8 @@ The make_* helpers build and return a Figure (no save/show) with compare.style c
 solver curves use the solver colours; FEM diagnostics (normal force, work, slip fraction)
 use NEUTRAL colours so they never read as a solver. main() sets Agg and saves the PNGs.
 
-Caveat: whether the VBD/SemiImplicit ground-contact runs exist depends on a recent
-Newton (TODO[verify-on-colab]); if only XPBD is present, only it is overlaid.
+Note: all three solvers' ground-contact runs (XPBD, VBD, SemiImplicit) record results;
+the plots gracefully overlay whichever runs are present on disk.
 
 Run:  python -m compare.friction
 """

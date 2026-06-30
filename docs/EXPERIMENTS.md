@@ -158,8 +158,9 @@ solver — Warp differentiates that integrator, not XPBD's positional projection
 XPBD's softness is measured separately and directly, by the equilibrium residual and
 the tip ratio in the convergence study and `compare/hanging_bar`. This piece is also
 the most Warp-version- and autodiff-specific (`finalize(requires_grad=True)`,
-`warp.optim.SGD`, learning rate); it is marked `TODO[verify-on-colab]` and the learning
-rate in particular needs tuning. See [STATUS.md](STATUS.md).
+`warp.optim.SGD`, learning rate); on the 2026-06-30 run it converged (loss 0.275 → 2.1e-4),
+so the learning rate is workable, though it remains a single fit characterising SemiImplicit,
+not cross-validated across budgets. See [STATUS.md](STATUS.md).
 
 ---
 

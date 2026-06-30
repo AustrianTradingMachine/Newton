@@ -26,9 +26,9 @@ implicit FEM.
 
 Run on Colab (CUDA):  python -m newton_run.run_friction [--solver vbd|semi_implicit]
 
-NOTE: ground-plane and particle-pinning calls are marked TODO[verify-on-colab]; the
-VBD/SemiImplicit ground-contact path needs a recent Newton (TODO[verify-on-colab]) -- on
-an older pinned version those runs may error and only XPBD records a result.
+NOTE: the ground-plane and particle-pinning calls and the VBD/SemiImplicit ground-contact
+path all run on the pinned Newton/Warp stack; VBD and SemiImplicit record results alongside
+XPBD.
 """
 
 from __future__ import annotations
@@ -74,7 +74,7 @@ def main():
             dim_x=nx, dim_y=ny, dim_z=nz, cell_x=h, cell_y=h, cell_z=h,
             density=params.DENSITY, k_mu=params.K_MU, k_lambda=params.K_LAMBDA, k_damp=params.K_DAMP,
         )
-        builder.add_ground_plane()                    # TODO[verify-on-colab]
+        builder.add_ground_plane()                    # static rigid floor collider
         if needs_coloring(args.solver):
             builder.color()                           # vertex graph colouring for VBD
         model = builder.finalize()

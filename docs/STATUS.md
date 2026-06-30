@@ -109,8 +109,9 @@ What is **still numerically open** (quality, not wiring):
 | **VBD / SemiImplicit indentation contact** | the `soft_contact` penalty is too soft — the sphere sinks ~33 mm through the 40 mm indent (strain energy ~0.1 J vs XPBD's ~13 J), so **XPBD** is the only Newton solver that geometrically resolves the indentation; the soft-contact stiffness for the implicit/explicit solvers is unsettled |
 | **θ\* fit** (`newton_run/diffsim.py`) | one converged fit characterising the **SemiImplicit** solver vs FEM (θ\* = 1.79); not cross-validated across budgets/scenarios |
 
-The source still carries `TODO[verify-on-colab]` markers on these paths; they now track this
-**numerical tuning**, not whether the API runs.
+The `TODO[verify-on-colab]` markers that used to flag these paths have been retired from the
+source (the run executed them); what remains is the **numerical tuning** above, not whether the
+API runs.
 
 ## Honesty rules (the standard this repo holds itself to)
 

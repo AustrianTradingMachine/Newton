@@ -19,8 +19,8 @@ Run from the repository root (after installing dolfinx, see 00_setup.ipynb):
     python -m fenics_run.run_hanging_bar                # tet (Newton's mesh)
     python -m fenics_run.run_hanging_bar --element hex  # independent hex mesh
 
-NOTE: a few dolfinx API points are version sensitive and marked
-TODO[verify-on-colab].
+A few dolfinx API points are version sensitive; the call sites below target the
+dolfinx 0.11 API.
 """
 
 from __future__ import annotations
@@ -61,8 +61,7 @@ def evaluate_at_nodes(u, msh, points):
     """
     import dolfinx.geometry as geom
 
-    # TODO[verify-on-colab]: geometry API names (bb_tree / compute_collisions_points
-    # / compute_colliding_cells) are stable in recent dolfinx but worth a check.
+    # dolfinx geometry API: bb_tree / compute_collisions_points / compute_colliding_cells.
     tree = geom.bb_tree(msh, msh.topology.dim)
     candidates = geom.compute_collisions_points(tree, points)
     colliding = geom.compute_colliding_cells(msh, candidates, points)

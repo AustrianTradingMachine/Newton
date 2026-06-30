@@ -153,10 +153,10 @@ SIM_SUBSTEPS_EXPLICIT = 32
 # it settles cleanly). Gauss-Seidel needs O(layers) iterations to propagate and more to
 # converge, so we use 50 -- which cuts the 10-iter error several-fold but still leaves the
 # tip ~3.2x too soft.
-# TODO[verify-on-colab]: 50 iters was observed still ~3.2x soft (tip ~140 mm) -- reaching
-# FEM/analytic would need substantially more iterations (toward 100+), at proportional cost;
-# slender structures are VBD's worst case for convergence. So VBD is NOT the accurate
-# implicit partner to FEM at this budget -- the hanging-bar prose must not claim it tracks FEM.
+# At 50 iters VBD still settles ~3.2x soft (tip ~140 mm); reaching FEM/analytic would need
+# substantially more iterations (toward 100+), at proportional cost -- slender structures are
+# VBD's worst case for convergence. So VBD is NOT the accurate implicit partner to FEM at this
+# budget -- the hanging-bar prose must not claim it tracks FEM.
 SIM_SUBSTEPS_VBD = 10
 VBD_ITERATIONS = 50
 MAX_FRAMES = 600                 # hard cap on the settling loop

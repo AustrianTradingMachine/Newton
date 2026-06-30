@@ -21,12 +21,14 @@ is something the fast solver cannot provide.
 > solvers (our contact runs are adapted from it). So running XPBD alone was a **wiring
 > choice**, not a Newton limitation.
 >
-> The honest caveat is now about **version**, not capability. The rich VBD soft/rigid-contact
-> path (VBD integrating rigid bodies itself via AVBD; the `rigid_body_particle_contact_buffer_size`
-> knob) landed on recent Newton `main`; the repo's pinned version may predate it, in which
-> case the VBD/SemiImplicit contact runs **error** and only XPBD records a result. This is
-> **unverified locally** (no GPU here) — `TODO[verify-on-colab]`: one CUDA run checks
-> `newton.__version__` and that `example_rigid_soft_contact.py --solver vbd` runs.
+> The honest caveat is no longer about **version** but about **result**. The rich VBD
+> soft/rigid-contact path (VBD integrating rigid bodies itself via AVBD; the
+> `rigid_body_particle_contact_buffer_size` knob) **runs on the pinned Newton** (Warp 1.14.0):
+> the 2026-06-30 run records VBD and SemiImplicit results for every contact scenario. What it
+> shows is that for **contact** the soft_contact penalty path is too soft for VBD/SemiImplicit —
+> in indentation the sphere sinks ~33 mm through the 40 mm indent, so **XPBD** is the only Newton
+> solver that geometrically resolves the contact, while in the drop only VBD makes a genuine
+> two-way impact.
 >
 > Two consequences to read honestly regardless: (i) the **drop** is the hardest case — its
 > *free* sphere needs VBD's two-way AVBD (the most version-sensitive path), and the FEM side

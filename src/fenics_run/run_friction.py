@@ -30,11 +30,11 @@ the friction force plateaus at mu*W -- both N~W and the plateau test the FEM.
 
 Run (needs dolfinx):  python -m fenics_run.run_friction
 
-TODO[verify-on-colab]: the static free-body settle was singular at u=0 -- the block has a
-free vertical rigid mode and the one-sided floor penalty is inactive at zero penetration --
-which produced an all-zero F/N/slip run (data/fem_friction.npz). settle_gravity now bootstraps
-an initial floor penetration; re-run on Colab to regenerate the npz and confirm N ~ W and the
-friction force reaching the mu*W plateau.
+Note: the static free-body settle is singular at u=0 -- the block has a free vertical rigid
+mode and the one-sided floor penalty is inactive at zero penetration -- which would otherwise
+produce an all-zero F/N/slip run (data/fem_friction.npz). settle_gravity bootstraps an initial
+floor penetration so contact is active (pen>0) from the first Newton iteration; the recorded run
+then settles with N ~ W and the friction force reaching the mu*W plateau.
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def main():
     v = ufl.TestFunction(V)
 
     # --- top-face drag: u_x = s (ramped), u_y = 0; z free (sits on floor) -----
-    # TODO[verify-on-colab]: component Dirichlet via V.sub(i).collapse()
+    # component Dirichlet on the top face via V.sub(i).collapse()
     V0, _ = V.sub(0).collapse()
     V1, _ = V.sub(1).collapse()
     def top(x):

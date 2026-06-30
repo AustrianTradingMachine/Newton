@@ -64,8 +64,8 @@ is the solver. Two mechanisms enforce that:
   ([`common/mesh_io.py`](../src/common/mesh_io.py)). The FEM tet run *consumes those exact
   arrays* (`create_mesh(comm, cells, element, x)`) and evaluates its solution at
   Newton's node positions, so the two results are comparable **node-for-node** (the
-  point evaluation uses dolfinx's point-location API, currently `TODO[verify-on-colab]`
-  — see [STATUS.md](STATUS.md) — so the per-node error numbers depend on that re-run). Tets
+  point evaluation uses dolfinx's point-location API; the 2026-06-30 run produced the
+  node-for-node reference — see [STATUS.md](STATUS.md)). Tets
   are defensively re-oriented to positive volume for dolfinx (`orient_tets_positive`).
 - **One material.** Newton's `add_soft_grid` uses a co-rotational tetrahedral FEM
   model parameterised by Lamé (μ, λ). FEniCSx uses a **compressible Neo-Hookean**

@@ -30,10 +30,11 @@ Outputs -> data/newton_indentation{,_vbd,_semi}.npz (per --solver):
 
 Run on Colab (CUDA):  python -m newton_run.run_indentation [--solver vbd|semi_implicit]
 
-NOTE: kinematic-body and particle-pinning calls are marked TODO[verify-on-colab];
-they follow the proven patterns in Newton's cable / rigid_soft_contact examples. The
-VBD/SemiImplicit contact path needs a recent Newton (TODO[verify-on-colab]); on an older
-pinned version those runs may error and only XPBD records a result.
+Solver coverage: the kinematic-body and particle-pinning calls follow the proven
+patterns in Newton's cable / rigid_soft_contact examples. All three solvers run and
+record results on the pinned stack, but the VBD/SemiImplicit soft_contact path is too
+soft for contact: the sphere sinks ~33 mm through the 40 mm indent, so XPBD is the only
+Newton solver that geometrically resolves the indentation.
 """
 
 from __future__ import annotations
@@ -96,7 +97,7 @@ def build_model(builder_cls, color=False):
         label="sphere",
     )
     builder.add_shape_sphere(sphere_body, radius=R, cfg=sphere_cfg, label="rigid_sphere")
-    _make_body_kinematic(builder, sphere_body)  # TODO[verify-on-colab]
+    _make_body_kinematic(builder, sphere_body)  # zero mass -> kinematic collider
 
     if color:
         builder.color()        # vertex graph colouring required by the VBD solver

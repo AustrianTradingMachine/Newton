@@ -11,10 +11,12 @@ and exposes no comparable force -- so here the solvers are compared on DEFORMATI
 which is the quantity all expose cleanly. The implicit VBD is the apples-to-apples
 counterpart to the implicit FEM.
 
-Caveat: whether the VBD/SemiImplicit contact runs exist depends on a recent Newton
-(TODO[verify-on-colab]); if only XPBD is present, only it is overlaid. Part of the
-residual Newton-vs-FEM dimple gap is constitutive (Newton StVK vs FEM Neo-Hookean),
-growing outside small strain -- it is not a pure solver gap.
+Caveat: all three Newton solvers run the contact path and record results, but for contact
+the VBD/SemiImplicit soft_contact path is too soft -- the sphere sinks ~33 mm through the
+40 mm indent, so XPBD is the only Newton solver that geometrically resolves the contact;
+the overlay simply shows whichever solver runs are present on disk. Part of the residual
+Newton-vs-FEM dimple gap is constitutive (Newton StVK vs FEM Neo-Hookean), growing outside
+small strain -- it is not a pure solver gap.
 
 The make_* helpers build and return a Figure (no save/show), so the notebook (20_contact)
 imports the SAME functions and renders inline; main() sets Agg and saves the PNGs. Colours

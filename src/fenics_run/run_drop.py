@@ -20,8 +20,8 @@ Records a time series -> data/fem_drop.npz:
 
 Run (after installing dolfinx):  python -m fenics_run.run_drop
 
-NOTE: heavily marked TODO[verify-on-colab]; dynamic contact needs dt / damping
-tuning, and the no-Dirichlet dynamic tangent relies on the mass term.
+NOTE: the dt / damping here are observations, not tuned to convergence; the
+no-Dirichlet dynamic tangent relies on the mass term.
 """
 
 from __future__ import annotations

@@ -21,8 +21,8 @@ VBD needs a vertex graph colouring (builder.color()); build_model applies it for
 the VBD solver only. Pinning (inverse mass = 0) and the settle loop are shared by
 all three solvers.
 
-NOTE: a few Warp/Newton API points are marked TODO[verify-on-colab]; they match
-the public examples, but exact attribute names can shift between Newton versions.
+The Warp/Newton API points used here match the public examples and run on the
+pinned Newton/Warp stack.
 """
 
 from __future__ import annotations

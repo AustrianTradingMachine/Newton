@@ -9,9 +9,9 @@ test's controlled quasi-static indentation).
 Solver note: runs all three Newton solvers via ``--solver xpbd|vbd|semi_implicit``
 (default XPBD). This is the HARDEST contact case: the sphere is a *free* rigid body, so
 the implicit VBD must integrate it two-way itself (AVBD) -- enabled via the
-``rigid_body_particle_contact_buffer_size`` knob in the shared solver factory -- the
-newest, most version-sensitive Newton path (TODO[verify-on-colab]). The implicit VBD is
-the natural counterpart to the implicit Newmark FEM, but note that even a successful VBD
+``rigid_body_particle_contact_buffer_size`` knob in the shared solver factory. Only VBD
+drives a genuine two-way impact on the free sphere; XPBD does not push the sphere down.
+The implicit VBD is the natural counterpart to the implicit Newmark FEM, but even a VBD
 run is only a *partial* fairness fix: the transient also mixes material (Newton
 StVK/co-rotational vs FEM Neo-Hookean), contact model and time integration (see
 compare/drop), so it is never a clean solver-only comparison.

@@ -12,13 +12,13 @@ solver.step(..., contacts, dt) reads it -- exactly the wiring Newton's own
 examples/multiphysics/example_rigid_soft_contact.py uses when switched between
 ``--solver xpbd | vbd | semi_implicit`` on a soft grid + rigid sphere + ground.
 
-TODO[verify-on-colab]: the rich VBD soft/rigid-contact path -- VBD integrating rigid
-bodies itself via AVBD (two-way coupling for a *free* collider) and the
-``rigid_body_particle_contact_buffer_size`` argument -- requires a recent Newton.
-The repo's pinned version may predate it (older VBD was cloth/soft self-contact
-only), in which case the VBD/SemiImplicit contact runs will error and only XPBD
-records a result. That is the honest, version-gated state until a CUDA run confirms
-it; see docs/CONTACT.md.
+All three solvers run this path on the pinned stack: the rich VBD soft/rigid-contact
+path -- VBD integrating rigid bodies itself via AVBD (two-way coupling for a *free*
+collider) and the ``rigid_body_particle_contact_buffer_size`` argument -- executes
+and records results; it does not error. The remaining caveat is numerical, not API:
+the VBD/SemiImplicit soft_contact is too soft -- in the indentation the sphere sinks
+~33 mm through the 40 mm indent -- so XPBD is the only Newton solver that
+geometrically resolves the contact. See docs/CONTACT.md.
 """
 
 from __future__ import annotations
@@ -39,8 +39,8 @@ def pin_particles(model, fixed_nodes) -> None:
     inv_mass = 0). Harmless to XPBD/SemiImplicit, which already key off inv_mass. Written
     in place with ``.assign()`` so a solver constructed afterwards reads the update.
 
-    TODO[verify-on-colab]: attribute names particle_inv_mass / particle_mass are from
-    Newton main and may shift between versions.
+    The pinned Newton exposes these as ``particle_inv_mass`` / ``particle_mass`` on the
+    finalized model.
     """
     inv_mass = model.particle_inv_mass.numpy()
     inv_mass[fixed_nodes] = 0.0
@@ -85,7 +85,7 @@ def make_solver(solver: str, model, iterations: int = 10, rigid_particle_buffer:
             particle_enable_tile_solve=False,
         )
         if rigid_particle_buffer is not None:
-            # TODO[verify-on-colab]: VBD two-way rigid coupling buffer (free collider).
+            # VBD two-way rigid coupling buffer (free collider), sized for the drop's sphere.
             kwargs["rigid_body_particle_contact_buffer_size"] = rigid_particle_buffer
         return newton.solvers.SolverVBD(**kwargs)
     if solver in ("semi_implicit", "explicit", "semi"):

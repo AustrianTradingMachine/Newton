@@ -31,8 +31,8 @@ uses; XPBD (the positional projection) is not differentiable.
 
 Run on Colab (CUDA):  python -m newton_run.diffsim
 
-NOTE: heavily marked TODO[verify-on-colab] -- this is the most Newton-version- and
-autodiff-specific piece; the learning rate in particular will need tuning.
+NOTE: this is the most Newton-version- and autodiff-specific piece; the learning
+rate in particular may need tuning when the underlying stack changes.
 """
 
 import argparse
@@ -81,7 +81,7 @@ class DiffFit:
             cell_x=params.CELL, cell_y=params.CELL, cell_z=params.CELL,
             density=params.DENSITY, k_mu=params.K_MU, k_lambda=params.K_LAMBDA, k_damp=params.K_DAMP,
         )
-        # TODO[verify-on-colab]: finalize(requires_grad=True) for differentiable sim
+        # finalize(requires_grad=True) builds the differentiable model
         self.model = builder.finalize(requires_grad=True)
 
         # clamp the top face (same as the forward hanging-bar run)

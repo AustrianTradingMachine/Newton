@@ -5,8 +5,8 @@ sphere height, penetration, block strain & kinetic energy (and the FEM contact
 force). This contrasts Newton's solvers against implicit FEM (Newmark) elastodynamics +
 contact, picking up whichever Newton solver runs are present
 (data/newton_drop{,_vbd,_semi}.npz). The implicit VBD is the natural counterpart to the
-implicit Newmark FEM -- but it is the hardest contact case (a *free* rigid sphere VBD must
-integrate two-way; TODO[verify-on-colab]), so its run may be absent on an older Newton.
+implicit Newmark FEM, and it is the hardest contact case: with a *free* rigid sphere, only
+VBD integrates a genuine two-way (AVBD) impact, while XPBD does not drive the sphere down.
 
 CAVEAT: even with an implicit (VBD) curve, the transient gap is NOT solver-only -- the
 sides also differ in material (Newton StVK/co-rotational vs FEM Neo-Hookean), contact
