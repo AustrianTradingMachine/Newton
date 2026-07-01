@@ -1,4 +1,5 @@
-# How accurate is NVIDIA Newton, really? — Newton vs. FEniCSx (FEM)
+<!-- headline: confirm wording -->
+# NVIDIA Newton vs. FEniCSx (FEM) — a soft-body accuracy benchmark
 
 A quantitative, apples-to-apples comparison of one **deformable soft body** simulated two ways:
 

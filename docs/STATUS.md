@@ -104,7 +104,7 @@ What is **still numerically open** (quality, not wiring):
 
 | item | what is unsettled |
 |---|---|
-| **SemiImplicit drop** | numerically unstable at this dt/substep budget — the energy blows up (peak strain energy 7536 J vs FEM 3.4 J); the only clearly-broken numeric this run |
+| **SemiImplicit drop** | numerically unstable at this dt/substep budget — the energy blows up (peak strain energy 7536 J vs FEM 3.4 J); the only clearly-unstable numeric this run |
 | **FEM drop** (`fenics_run/run_drop.py`) | dt / damping are not tuned to convergence; the transient numbers are observations, not a settled benchmark |
 | **VBD / SemiImplicit indentation contact** | the `soft_contact` penalty is too soft — the sphere sinks ~33 mm through the 40 mm indent (strain energy ~0.1 J vs XPBD's ~13 J), so **XPBD** is the only Newton solver that geometrically resolves the indentation; the soft-contact stiffness for the implicit/explicit solvers is unsettled |
 | **θ\* fit** (`newton_run/diffsim.py`) | one converged fit characterising the **SemiImplicit** solver vs FEM (θ\* = 1.79); not cross-validated across budgets/scenarios |

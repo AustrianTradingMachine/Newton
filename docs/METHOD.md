@@ -90,7 +90,7 @@ is the solver. Two mechanisms enforce that:
   the collapsed/degenerate-hexahedron tets with reduced integration + hourglass control
   that explicit codes (e.g. LS-DYNA) often use for "tets". Real P1 simplex tets are known
   to be **over-stiff in bending and near-incompressibility (locking)** because a
-  constant-strain element is too poor to represent those modes, so this is the honest
+  constant-strain element is too stiff to represent those modes, so this is the honest
   like-for-like element, not the most accurate one. → `data/fem_result.npz`
 - **hex** — an *independent* structured hexahedral mesh of the same block geometry
   (`create_box`, trilinear Hex8, full 2×2×2 integration — no reduced-integration
